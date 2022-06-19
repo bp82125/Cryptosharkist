@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <iup.h>
 #include <stdio.h>
+#include <string.h>
 
 #define M 26
 #define N 26
