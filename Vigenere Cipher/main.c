@@ -5,37 +5,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#define M 26
-#define N 26
-
-unsigned char Map1[M][N];  // mảng Vigenere với chữ hoa
-unsigned char Map2[M][N];  // mảng Vigenere với chữ thường
-
-void Init_Vigenere_Map1() {   // khởi tạo bảng chữ hoa
-    for (int i = 0; i < M; ++i) {
-        Map1[i][0] = 'A' + i;   // đầu mỗi hàng là chữ cái theo thứ tự A-Z
-        for (int j = 1; j < N; ++j) {
-            Map1[i][j] = Map1[i][0] + j;  // thêm từ kí tự vào các ô trong từng hàng
-            if (Map1[i][j] > 'Z') {
-                Map1[i][j] -= 26;  // nếu vượt quá Z thì trở lại vị trí ban đầu là A
-            }
-        }
-    }
-}
-
-void Init_Vigenere_Map2() { // khởi tạo bảng chữ thường
-    for (int i = 0; i < M; ++i) {
-        Map2[i][0] = 'a' + i;
-        for (int j = 1; j < N; ++j) {     // giống trên
-            Map2[i][j] = Map2[i][0] + j;
-            if (Map2[i][j] > 'z') {
-                Map2[i][j] -= 26;
-            }
-        }
-    }
-}
-
-void replace_char(char res[], char keyword[]) {
+void replace_char(char source[], char res[], char keyword[]) {
     int k = 0; //biến đếm kí tự của chuỗi keyword
     int n = strlen(res);
     int m = strlen(keyword);
@@ -46,22 +16,27 @@ void replace_char(char res[], char keyword[]) {
         if (k >= m) {
             k = 0; //nếu vượt quá phạm vi keyword thì biến đếm trở về vị trí đầu
         }
-        res[i] = keyword[k]; // thay thế từng kí tự chuỗi gốc bằng kí tự trong keyword
-        k++;
+        if ((source[i] >= 'a' && source[i] <= 'z') || (source[i] >= 'A' && source[i] <= 'Z')) {
+            res[i] = keyword[k]; // thay thế từng kí tự chuỗi gốc bằng kí tự trong keyword
+            k++;
+        }
+        else {
+            res[i] = source[i];
+        }
+
     }
 }
 
 void encrypt(char source[], char res[]) {
     for (int i = 0; i < strlen(source); i++) {
-        if (source[i] == ' ') {
+        if (source[i] == ' ')
             continue;
-        }
-        if (source[i] >= 'a' && source[i] <= 'z') {
-            res[i] = Map2[source[i] - 'a'][res[i] - 'a'];
-        }
-        if (source[i] >= 'A' && source[i] <= 'Z') {
-            res[i] = Map1[source[i] - 'A'][res[i] - 'a'];
-        }
+        if (source[i] >= 'a' && source[i] <= 'z')
+            res[i] = ((source[i] - 97) + (res[i] - 97)) % 26 + 97;
+        else if (source[i] >= 'A' && source[i] <= 'Z')
+            res[i] = ((source[i] - 65) + (res[i] - 97)) % 26 + 65;
+        else
+            continue;
     }
 }
 
@@ -102,7 +77,7 @@ int btn_encrypt_cb(Ihandle* self) {
     sprintf(res, "%s", IupGetAttribute(text_res, "VALUE"));
 
     sprintf(res, "%s", source);
-    replace_char(res, keyword);
+    replace_char(source, res, keyword);
     encrypt(source, res);
 
     IupSetAttribute(text_res, "VALUE", res);
@@ -127,7 +102,7 @@ int btn_descrypt_cb(Ihandle* self) {
     sprintf(res, "%s", IupGetAttribute(text_res, "VALUE"));
 
     sprintf(res, "%s", source);
-    replace_char(res, keyword);
+    replace_char(source ,res, keyword);
     descrypt(source, res);
 
     IupSetAttribute(text_res, "VALUE", res);
@@ -136,9 +111,6 @@ int btn_descrypt_cb(Ihandle* self) {
 
 int main(int argc, char** argv)
 {
-    Init_Vigenere_Map1();
-    Init_Vigenere_Map2();
-
     Ihandle* dlg;
     Ihandle* text_source;
     Ihandle* text_keyword;
