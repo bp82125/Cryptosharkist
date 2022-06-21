@@ -3,7 +3,7 @@
 [Microsoft Visual C++ 2015-2022 Redistribute x86](https://docs.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist?view=msvc-170)
 ## Tính năng
 - Có thể mã hoá chuỗi với cả kí tự thường, hoa và các kí tự đặc biệt khác <br />
-- Mã hoá được nhiều chuỗi liên tiếp <br />
+- Mã hoá không giới hạn số lượng kí tự của chuỗi <br />
 - Giao diện đồ hoạ thân thiện với người dùng, sử dụng [IUP](https://www.tecgraf.puc-rio.br/iup/) <br />
 ## Mục tiêu tương lai
 - Có thể khởi tạo keyword ngẫu nhiên <br />
