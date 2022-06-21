@@ -4,6 +4,7 @@
 #include <iup.h>
 #include <stdio.h>
 #include <string.h>
+#include <malloc.h>
 
 void replace_char(char source[], char res[], char keyword[]) {
     int k = 0; //biến đếm kí tự của chuỗi keyword
@@ -64,23 +65,35 @@ int btn_encrypt_cb(Ihandle* self) {
     Ihandle* text_source;
     Ihandle* text_keyword;
 
-    char source[256];
-    char keyword[256];
-    char res[256];
-
     text_keyword = IupGetHandle("text_keyword");
     text_source = IupGetHandle("text_source");
     text_res = IupGetHandle("text_res");
 
-    sprintf(source, "%s", IupGetAttribute(text_source, "VALUE"));
-    sprintf(keyword, "%s", IupGetAttribute(text_keyword, "VALUE"));
-    sprintf(res, "%s", IupGetAttribute(text_res, "VALUE"));
+    int source_len = strlen(IupGetAttribute(text_source, "VALUE"));
+    int keyword_len = strlen(IupGetAttribute(text_keyword, "VALUE"));
 
-    sprintf(res, "%s", source);
-    replace_char(source, res, keyword);
-    encrypt(source, res);
+    if (source_len == 0 || keyword_len == 0) {
+        IupMessage("Baka do ngoc", "Chua nhap gi kia :v");
+    }
+    else {
+        char* source = (char*)malloc(sizeof(char) * (source_len + 1));
+        char* keyword = (char*)malloc(sizeof(char) * (keyword_len + 1));
+        char* res = (char*)malloc(sizeof(char) * (source_len + 1));
 
-    IupSetAttribute(text_res, "VALUE", res);
+        sprintf(source, "%s", IupGetAttribute(text_source, "VALUE"));
+        sprintf(keyword, "%s", IupGetAttribute(text_keyword, "VALUE"));
+        sprintf(res, "%s", IupGetAttribute(text_res, "VALUE"));
+
+        sprintf(res, "%s", source);
+        replace_char(source, res, keyword);
+        encrypt(source, res);
+
+        IupSetAttribute(text_res, "VALUE", res);
+
+        free(source);
+        free(keyword);
+        free(res);
+    }
     return IUP_DEFAULT;
 }
 
@@ -89,23 +102,35 @@ int btn_descrypt_cb(Ihandle* self) {
     Ihandle* text_source;
     Ihandle* text_keyword;
 
-    char source[256];
-    char keyword[256];
-    char res[256];
-
     text_keyword = IupGetHandle("text_keyword");
     text_source = IupGetHandle("text_source");
     text_res = IupGetHandle("text_res");
 
-    sprintf(source, "%s", IupGetAttribute(text_source, "VALUE"));
-    sprintf(keyword, "%s", IupGetAttribute(text_keyword, "VALUE"));
-    sprintf(res, "%s", IupGetAttribute(text_res, "VALUE"));
+    int source_len = strlen(IupGetAttribute(text_source, "VALUE"));
+    int keyword_len = strlen(IupGetAttribute(text_keyword, "VALUE"));
 
-    sprintf(res, "%s", source);
-    replace_char(source ,res, keyword);
-    descrypt(source, res);
+    if (source_len == 0 || keyword_len == 0) {
+        IupMessage("Baka do ngoc", "Chua nhap gi kia :v");
+    }
+    else {
+        char* source = (char*)malloc(sizeof(char) * (source_len + 1));
+        char* keyword = (char*)malloc(sizeof(char) * (keyword_len + 1));
+        char* res = (char*)malloc(sizeof(char) * (source_len + 1));
 
-    IupSetAttribute(text_res, "VALUE", res);
+        sprintf(source, "%s", IupGetAttribute(text_source, "VALUE"));
+        sprintf(keyword, "%s", IupGetAttribute(text_keyword, "VALUE"));
+        sprintf(res, "%s", IupGetAttribute(text_res, "VALUE"));
+
+        sprintf(res, "%s", source);
+        replace_char(source, res, keyword);
+        descrypt(source, res);
+
+        IupSetAttribute(text_res, "VALUE", res);
+
+        free(source);
+        free(keyword);
+        free(res);
+    }
     return IUP_DEFAULT;
 }
 
