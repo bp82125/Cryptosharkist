@@ -60,6 +60,21 @@ void descrypt(char source[], char res[]) {
     }
 }
 
+int btn_clear_cb(Ihandle* self) {
+    Ihandle* text_res;
+    Ihandle* text_source;
+    Ihandle* text_keyword;
+
+    text_keyword = IupGetHandle("text_keyword");
+    text_source = IupGetHandle("text_source");
+    text_res = IupGetHandle("text_res");
+
+    IupSetAttribute(text_source, "VALUE", NULL);
+    IupSetAttribute(text_keyword, "VALUE", NULL);
+    IupSetAttribute(text_res, "VALUE", NULL);
+    return IUP_DEFAULT;
+}
+
 int btn_encrypt_cb(Ihandle* self) {
     Ihandle* text_res;
     Ihandle* text_source;
@@ -143,6 +158,7 @@ int main(int argc, char** argv)
     Ihandle* ebox;
     Ihandle* btn_encrypt;
     Ihandle* btn_descrypt;
+    Ihandle* btn_clear;
     IupOpen(&argc, &argv);
 
     text_keyword = IupText(NULL);
@@ -151,11 +167,13 @@ int main(int argc, char** argv)
 
     btn_encrypt = IupButton("Encrypt", NULL);
     btn_descrypt = IupButton("Descrypt", NULL);
+    btn_clear = IupButton("Clear", NULL);
     ebox = IupVbox(
         text_source,
         text_keyword,
         IupHbox(
             btn_encrypt, btn_descrypt, NULL),
+        btn_clear,
         text_res,
         NULL
     );
@@ -166,6 +184,7 @@ int main(int argc, char** argv)
 
     IupSetAttribute(btn_encrypt, "PADDING", "30x2");
     IupSetAttribute(btn_descrypt, "PADDING", "30x2");
+    IupSetAttribute(btn_clear, "PADDING", "40x2");
 
     IupSetAttribute(text_source, "MULTILINE", "YES");
     IupSetAttribute(text_source, "EXPAND", "YES");
@@ -195,6 +214,7 @@ int main(int argc, char** argv)
 
     IupSetCallback(btn_encrypt, "ACTION", (Icallback)btn_encrypt_cb);
     IupSetCallback(btn_descrypt, "ACTION", (Icallback)btn_descrypt_cb);
+    IupSetCallback(btn_clear, "ACTION", (Icallback)btn_clear_cb);
 
     IupMainLoop();
 
