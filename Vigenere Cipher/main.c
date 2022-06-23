@@ -5,6 +5,9 @@
 #include <stdio.h>
 #include <string.h>
 #include <malloc.h>
+#include <Windows.h>
+
+/*****-Xử lí chuỗi-*****/
 
 void replace_char(char source[], char res[], char keyword[]) {
     int k = 0; //biến đếm kí tự của chuỗi keyword
@@ -29,8 +32,9 @@ void replace_char(char source[], char res[], char keyword[]) {
 }
 
 void encrypt(char source[], char res[]) {
-    for (int i = 0; i < strlen(source); i++) {
-        if (source[i] == ' ')
+    int n = strlen(source);
+    for (int i = 0; i < n; i++) {
+        if (source[i] == ' ') // nếu là khoảng trắng thì skip
             continue;
         if (source[i] >= 'a' && source[i] <= 'z')
             res[i] = ((source[i] - 97) + (res[i] - 97)) % 26 + 97;
@@ -42,7 +46,8 @@ void encrypt(char source[], char res[]) {
 }
 
 void descrypt(char source[], char res[]) {
-    for (int i = 0; i < strlen(source); i++) {
+    int n = strlen(source);
+    for (int i = 0; i < n; i++) {
         if (source[i] == ' ') {
             continue;
         }
@@ -59,6 +64,8 @@ void descrypt(char source[], char res[]) {
                 res[i] = source[i] - ((res[i] - 32) - 'A') + 26;
     }
 }
+
+/*****-Xử lí các nút bấm-*****/
 
 int btn_clear_cb(Ihandle* self) {
     Ihandle* text_res;
@@ -149,8 +156,7 @@ int btn_descrypt_cb(Ihandle* self) {
     return IUP_DEFAULT;
 }
 
-int main(int argc, char** argv)
-{
+void Vigenere_Cipher() {
     Ihandle* dlg;
     Ihandle* text_source;
     Ihandle* text_keyword;
@@ -159,7 +165,6 @@ int main(int argc, char** argv)
     Ihandle* btn_encrypt;
     Ihandle* btn_descrypt;
     Ihandle* btn_clear;
-    IupOpen(&argc, &argv);
 
     text_keyword = IupText(NULL);
     text_source = IupText(NULL);
@@ -172,8 +177,7 @@ int main(int argc, char** argv)
         text_source,
         text_keyword,
         IupHbox(
-            btn_encrypt, btn_descrypt, NULL),
-        btn_clear,
+            btn_encrypt, btn_descrypt, btn_clear, NULL),
         text_res,
         NULL
     );
@@ -184,7 +188,7 @@ int main(int argc, char** argv)
 
     IupSetAttribute(btn_encrypt, "PADDING", "30x2");
     IupSetAttribute(btn_descrypt, "PADDING", "30x2");
-    IupSetAttribute(btn_clear, "PADDING", "40x2");
+    IupSetAttribute(btn_clear, "PADDING", "30x2");
 
     IupSetAttribute(text_source, "MULTILINE", "YES");
     IupSetAttribute(text_source, "EXPAND", "YES");
@@ -215,6 +219,13 @@ int main(int argc, char** argv)
     IupSetCallback(btn_encrypt, "ACTION", (Icallback)btn_encrypt_cb);
     IupSetCallback(btn_descrypt, "ACTION", (Icallback)btn_descrypt_cb);
     IupSetCallback(btn_clear, "ACTION", (Icallback)btn_clear_cb);
+}
+
+int main(int argc, char** argv)
+{
+    IupOpen(&argc, &argv);
+
+    Vigenere_Cipher();
 
     IupMainLoop();
 
