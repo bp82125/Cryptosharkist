@@ -9,6 +9,19 @@
 
 /*****-Xử lí chuỗi-*****/
 
+int keyword_check(char keyword[]) {
+    int n = strlen(keyword);
+    for (int i = 0; i < n; i++) {
+        if (keyword[i] >= 'A' && keyword[i] <= 'Z') {
+            keyword[i] += 32;
+        }
+        else if (keyword[i] < 'a' || keyword[i] > 'z') {
+            return 0;
+        }
+    }
+    return 1;
+}
+
 void replace_char(char source[], char res[], char keyword[]) {
     int k = 0; //biến đếm kí tự của chuỗi keyword
     int n = strlen(res);
@@ -96,26 +109,32 @@ int btn_encrypt_cb(Ihandle* self) {
 
     if (source_len == 0 || keyword_len == 0) {
         IupMessage("Baka do ngoc", "Chua nhap gi kia :v");
+        return IUP_DEFAULT;
     }
-    else {
-        char* source = (char*)malloc(sizeof(char) * (source_len + 1));
-        char* keyword = (char*)malloc(sizeof(char) * (keyword_len + 1));
-        char* res = (char*)malloc(sizeof(char) * (source_len + 1));
 
-        sprintf(source, "%s", IupGetAttribute(text_source, "VALUE"));
-        sprintf(keyword, "%s", IupGetAttribute(text_keyword, "VALUE"));
-        sprintf(res, "%s", IupGetAttribute(text_res, "VALUE"));
+    char* source = (char*)malloc(sizeof(char) * (source_len + 1));
+    char* keyword = (char*)malloc(sizeof(char) * (keyword_len + 1));
+    char* res = (char*)malloc(sizeof(char) * (source_len + 1));
 
-        sprintf(res, "%s", source);
-        replace_char(source, res, keyword);
-        encrypt(source, res);
+    sprintf(keyword, "%s", IupGetAttribute(text_keyword, "VALUE"));
 
-        IupSetAttribute(text_res, "VALUE", res);
-
-        free(source);
-        free(keyword);
-        free(res);
+    if (keyword_check(keyword) == 0) {
+        IupMessage("Baka do ngoc", "Nhap sai keyword roi kia :v");
+        return IUP_DEFAULT;
     }
+
+    sprintf(source, "%s", IupGetAttribute(text_source, "VALUE"));
+    sprintf(res, "%s", IupGetAttribute(text_res, "VALUE"));
+    
+    sprintf(res, "%s", source);
+    replace_char(source, res, keyword);
+    encrypt(source, res);
+
+    IupSetAttribute(text_res, "VALUE", res);
+
+    free(source);
+    free(keyword);
+    free(res);
     return IUP_DEFAULT;
 }
 
@@ -133,26 +152,32 @@ int btn_descrypt_cb(Ihandle* self) {
 
     if (source_len == 0 || keyword_len == 0) {
         IupMessage("Baka do ngoc", "Chua nhap gi kia :v");
+        return IUP_DEFAULT;
     }
-    else {
-        char* source = (char*)malloc(sizeof(char) * (source_len + 1));
-        char* keyword = (char*)malloc(sizeof(char) * (keyword_len + 1));
-        char* res = (char*)malloc(sizeof(char) * (source_len + 1));
 
-        sprintf(source, "%s", IupGetAttribute(text_source, "VALUE"));
-        sprintf(keyword, "%s", IupGetAttribute(text_keyword, "VALUE"));
-        sprintf(res, "%s", IupGetAttribute(text_res, "VALUE"));
+    char* source = (char*)malloc(sizeof(char) * (source_len + 1));
+    char* keyword = (char*)malloc(sizeof(char) * (keyword_len + 1));
+    char* res = (char*)malloc(sizeof(char) * (source_len + 1));
 
-        sprintf(res, "%s", source);
-        replace_char(source, res, keyword);
-        descrypt(source, res);
+    sprintf(keyword, "%s", IupGetAttribute(text_keyword, "VALUE"));
 
-        IupSetAttribute(text_res, "VALUE", res);
-
-        free(source);
-        free(keyword);
-        free(res);
+    if (keyword_check(keyword) == 0) {
+        IupMessage("Baka do ngoc", "Nhap sai keyword roi kia :v");
+        return IUP_DEFAULT;
     }
+
+    sprintf(source, "%s", IupGetAttribute(text_source, "VALUE"));
+    sprintf(res, "%s", IupGetAttribute(text_res, "VALUE"));
+
+    sprintf(res, "%s", source);
+    replace_char(source, res, keyword);
+    descrypt(source, res);
+
+    IupSetAttribute(text_res, "VALUE", res);
+
+    free(source);
+    free(keyword);
+    free(res);
     return IUP_DEFAULT;
 }
 
