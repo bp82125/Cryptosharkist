@@ -186,10 +186,13 @@ void Vigenere_Cipher() {
     Ihandle* text_source;
     Ihandle* text_keyword;
     Ihandle* text_res;
-    Ihandle* ebox;
+    Ihandle* element_box;
     Ihandle* btn_encrypt;
     Ihandle* btn_descrypt;
     Ihandle* btn_clear;
+    Ihandle* frame_encrypt;
+    Ihandle* frame_keyword;
+    Ihandle* frame_res;
 
     text_keyword = IupText(NULL);
     text_source = IupText(NULL);
@@ -198,18 +201,30 @@ void Vigenere_Cipher() {
     btn_encrypt = IupButton("Encrypt", NULL);
     btn_descrypt = IupButton("Descrypt", NULL);
     btn_clear = IupButton("Clear", NULL);
-    ebox = IupVbox(
-        text_source,
-        text_keyword,
+
+    frame_encrypt = IupFrame(text_source);
+    frame_keyword = IupFrame(text_keyword);
+    frame_res = IupFrame(text_res);
+
+    element_box = IupVbox(
+        frame_encrypt,
+        frame_keyword,
         IupHbox(
-            btn_encrypt, btn_descrypt, btn_clear, NULL),
-        text_res,
+            btn_encrypt,
+            btn_descrypt,
+            btn_clear,
+            NULL),
+        frame_res,
         NULL
     );
 
-    IupSetAttribute(ebox, "ALIGNMENT", "ACENTER");
-    IupSetAttribute(ebox, "GAP", "10");
-    IupSetAttribute(ebox, "MARGIN", "10x10");
+    IupSetAttribute(frame_encrypt, "TITLE", "Enter plain text/cipher text here:");
+    IupSetAttribute(frame_keyword, "TITLE", "Enter keyword here:");
+    IupSetAttribute(frame_res, "TITLE", "Result:");
+
+    IupSetAttribute(element_box, "ALIGNMENT", "ACENTER");
+    IupSetAttribute(element_box, "GAP", "10");
+    IupSetAttribute(element_box, "MARGIN", "10x10");
 
     IupSetAttribute(btn_encrypt, "PADDING", "30x2");
     IupSetAttribute(btn_descrypt, "PADDING", "30x2");
@@ -232,7 +247,7 @@ void Vigenere_Cipher() {
     IupSetHandle("text_keyword", text_keyword);
 
     dlg = IupDialog(
-        ebox
+        element_box
     );
 
     IupSetAttribute(dlg, "TITLE", "Vigenère Cipher");
