@@ -9,6 +9,7 @@
 - Có thể khởi tạo keyword ngẫu nhiên <br />
 - Thêm nút clear có thể xoá hết tất cả kí tự <br />
 - Mã hoá file .txt <br />
+- Thêm dark mode <br />
 ## Cách mã hoá
   Giả sử với một chuỗi cho trước sau:
   ```
