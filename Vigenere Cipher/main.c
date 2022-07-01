@@ -5,10 +5,40 @@
 #include <stdio.h>
 #include <string.h>
 #include <malloc.h>
-#include <Windows.h>
 
-/*****-Xử lí chuỗi-*****/
+/******************************-Xử lí chuỗi-*********************************/
 
+char* read_file(const char* filename)
+{
+    int size;
+    char* str;
+    FILE* file = fopen(filename, "rb");
+    if (!file)
+    {
+        IupMessagef("Error", "Can't open file: %s", filename);
+        return NULL;
+    }
+
+    /* tính toán độ lớn của file */
+    fseek(file, 0, SEEK_END);
+    size = ftell(file);
+    fseek(file, 0, SEEK_SET);
+
+    /* cấp phát bộ nhớ cho chuỗi chứa đường dẫn và thêm kí tự kết thúc */
+    str = malloc(size + 1);
+    /* đọc dữ liệu của file và truyền vào str */
+    fread(str, size, 1, file);
+    /* thêm kí tự kết thúc chuỗi */
+    str[size] = 0;
+
+    if (ferror(file))
+        IupMessagef("Error", "Fail when reading from file: %s", filename);
+
+    fclose(file);
+    return str;
+}
+
+/* hàm kiểm tra keyword hợp lệ */
 int keyword_check(char keyword[]) {
     int n = strlen(keyword);
     for (int i = 0; i < n; i++) {
@@ -22,6 +52,7 @@ int keyword_check(char keyword[]) {
     return 1;
 }
 
+/* hàm thay thế chuỗi bằng keyword */
 void replace_char(char source[], char res[], char keyword[]) {
     int k = 0; //biến đếm kí tự của chuỗi keyword
     int n = strlen(res);
@@ -44,6 +75,7 @@ void replace_char(char source[], char res[], char keyword[]) {
     }
 }
 
+/* hàm mã hoá */
 void encrypt(char source[], char res[]) {
     int n = strlen(source);
     for (int i = 0; i < n; i++) {
@@ -58,6 +90,7 @@ void encrypt(char source[], char res[]) {
     }
 }
 
+/* hàm giải mã */
 void descrypt(char source[], char res[]) {
     int n = strlen(source);
     for (int i = 0; i < n; i++) {
@@ -78,8 +111,39 @@ void descrypt(char source[], char res[]) {
     }
 }
 
-/*****-Xử lí các nút bấm-*****/
+/****************************-Xử lí các nút bấm-*****************************/
 
+/*nút mở và đọc file */
+int btn_open_cb(void)
+{
+    Ihandle *text_source = IupGetHandle("text_source");
+    Ihandle *filedlg = IupFileDlg();
+    IupSetAttribute(filedlg, "DIALOGTYPE", "OPEN");
+    IupSetAttribute(filedlg, "EXTFILTER", "Text Files|*.txt|All Files|*.*|");
+
+    IupPopup(filedlg, IUP_CENTER, IUP_CENTER);
+
+    if (IupGetInt(filedlg, "STATUS") != -1)
+    {
+        char* filename = IupGetAttribute(filedlg, "VALUE");
+        char* str = read_file(filename);
+        if (str)
+        {
+            IupSetStrAttribute(text_source, "VALUE", str);
+            free(str);
+        }
+    }
+
+    IupDestroy(filedlg);
+    return IUP_DEFAULT;
+}
+
+/* nút exit */
+int btn_exit_cb(Ihandle* self) {
+    return IUP_CLOSE;
+}
+
+/* nút clear */
 int btn_clear_cb(Ihandle* self) {
     Ihandle* text_res;
     Ihandle* text_source;
@@ -95,6 +159,7 @@ int btn_clear_cb(Ihandle* self) {
     return IUP_DEFAULT;
 }
 
+/* nút encrypt */
 int btn_encrypt_cb(Ihandle* self) {
     Ihandle* text_res;
     Ihandle* text_source;
@@ -138,6 +203,7 @@ int btn_encrypt_cb(Ihandle* self) {
     return IUP_DEFAULT;
 }
 
+/* nút descrypt */
 int btn_descrypt_cb(Ihandle* self) {
     Ihandle* text_res;
     Ihandle* text_source;
@@ -181,30 +247,56 @@ int btn_descrypt_cb(Ihandle* self) {
     return IUP_DEFAULT;
 }
 
+/*********************-Hàm chính trong GUI-***********************/
+
 void Vigenere_Cipher() {
-    Ihandle* dlg;
-    Ihandle* text_source;
-    Ihandle* text_keyword;
-    Ihandle* text_res;
-    Ihandle* element_box;
-    Ihandle* btn_encrypt;
-    Ihandle* btn_descrypt;
-    Ihandle* btn_clear;
-    Ihandle* frame_encrypt;
-    Ihandle* frame_keyword;
-    Ihandle* frame_res;
+    Ihandle *dlg, *element_box;
+    Ihandle *text_source, *text_keyword, *text_res;
+    Ihandle *btn_encrypt, *btn_descrypt, *btn_clear;
+    Ihandle *frame_encrypt, *frame_keyword, *frame_res;
+    Ihandle *item_open, *item_saveas, *item_exit;
+    Ihandle *file_menu, *sub1_menu, *main_menu;
+
+    //khai báo text box
 
     text_keyword = IupText(NULL);
     text_source = IupText(NULL);
     text_res = IupText(NULL);
 
+    //khai báo các nút
+
     btn_encrypt = IupButton("Encrypt", NULL);
     btn_descrypt = IupButton("Descrypt", NULL);
     btn_clear = IupButton("Clear", NULL);
 
+    // khai báo các khung
+
     frame_encrypt = IupFrame(text_source);
     frame_keyword = IupFrame(text_keyword);
     frame_res = IupFrame(text_res);
+
+    //khai báo các phần tử menu
+
+    item_open = IupItem("Open...", NULL);
+    item_saveas = IupItem("Save as...", NULL);
+    item_exit = IupItem("Exit", NULL);
+
+    //khai báo các thành phần của sub menu file
+
+    file_menu = IupMenu(
+        item_open,
+        item_saveas,
+        IupSeparator(),
+        item_exit,
+        NULL);
+
+    sub1_menu = IupSubmenu("File", file_menu);
+
+    //khai báo menu chính
+
+    main_menu = IupMenu(sub1_menu, NULL);
+
+    //cho các thành phần vào hộp các phần tử
 
     element_box = IupVbox(
         frame_encrypt,
@@ -218,17 +310,25 @@ void Vigenere_Cipher() {
         NULL
     );
 
+    //thêm tựa đề cho các khung
+
     IupSetAttribute(frame_encrypt, "TITLE", "Enter plain text/cipher text here:");
     IupSetAttribute(frame_keyword, "TITLE", "Enter keyword here:");
     IupSetAttribute(frame_res, "TITLE", "Result:");
+
+    //điều chỉnh hộp phần tử
 
     IupSetAttribute(element_box, "ALIGNMENT", "ACENTER");
     IupSetAttribute(element_box, "GAP", "10");
     IupSetAttribute(element_box, "MARGIN", "10x10");
 
+    //điều chỉnh các nút
+
     IupSetAttribute(btn_encrypt, "PADDING", "30x2");
     IupSetAttribute(btn_descrypt, "PADDING", "30x2");
     IupSetAttribute(btn_clear, "PADDING", "30x2");
+
+    //điều chỉnh các text box
 
     IupSetAttribute(text_source, "MULTILINE", "YES");
     IupSetAttribute(text_source, "EXPAND", "YES");
@@ -241,24 +341,35 @@ void Vigenere_Cipher() {
     IupSetAttribute(text_keyword, "MULTILINE", "NO");
     IupSetAttribute(text_keyword, "EXPAND", "HORIZONTAL");
 
+    //tạo các handle để các text box có thể xài global
 
     IupSetHandle("text_source", text_source);
     IupSetHandle("text_res", text_res);
     IupSetHandle("text_keyword", text_keyword);
 
+    // thêm hộp phần tử vào dialog
     dlg = IupDialog(
         element_box
     );
 
+    //điều chỉnh dialog
+
     IupSetAttribute(dlg, "TITLE", "Vigenère Cipher");
-    IupSetAttribute(dlg, "SIZE", "QUARTERx200");
+    IupSetAttributeHandle(dlg, "MENU", main_menu);
+    IupSetAttribute(dlg, "SIZE", "THIRDx250");
     IupSetAttribute(dlg, "RESIZE", "YES");
     IupShowXY(dlg, IUP_CENTER, IUP_CENTER);
-    IupSetAttribute(dlg, "USERSIZE", NULL);
+
+    //gán các event cho các nút
 
     IupSetCallback(btn_encrypt, "ACTION", (Icallback)btn_encrypt_cb);
     IupSetCallback(btn_descrypt, "ACTION", (Icallback)btn_descrypt_cb);
     IupSetCallback(btn_clear, "ACTION", (Icallback)btn_clear_cb);
+
+    //gán event cho các nút trong menu
+
+    IupSetCallback(item_open, "ACTION", (Icallback)btn_open_cb);
+    IupSetCallback(item_exit, "ACTION", (Icallback)btn_exit_cb);
 }
 
 int main(int argc, char** argv)
