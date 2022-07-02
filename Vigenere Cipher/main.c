@@ -38,6 +38,24 @@ char* read_file(const char* filename)
     return str;
 }
 
+void write_file(const char* filename, const char* str, int count)
+{
+    FILE* file = fopen(filename, "w");
+    if (!file)
+    {
+        IupMessagef("Error", "Can't open file: %s", filename);
+        return;
+    }
+
+    fwrite(str, 1, count, file);
+
+    if (ferror(file))
+        IupMessagef("Error", "Fail when writing to file: %s", filename);
+
+    fclose(file);
+}
+
+
 /* hàm kiểm tra keyword hợp lệ */
 int keyword_check(char keyword[]) {
     int n = strlen(keyword);
@@ -114,6 +132,28 @@ void descrypt(char source[], char res[]) {
 /****************************-Xử lí các nút bấm-*****************************/
 
 /*nút mở và đọc file */
+int btn_saveas_cb(void)
+{
+    Ihandle* text_res = IupGetHandle("text_res");
+    Ihandle* filedlg = IupFileDlg();
+    IupSetAttribute(filedlg, "DIALOGTYPE", "SAVE");
+    IupSetAttributes(filedlg, "FILTER = \"*.txt\"");
+
+    IupPopup(filedlg, IUP_CENTER, IUP_CENTER);
+
+    if (IupGetInt(filedlg, "STATUS") != -1)
+    {
+        char* filename = IupGetAttribute(filedlg, "VALUE");
+        strncat(filename, ".txt", 5);
+        char* str = IupGetAttribute(text_res, "VALUE");
+        int count = IupGetInt(text_res, "COUNT");
+        write_file(filename, str, count);
+    }
+
+    IupDestroy(filedlg);
+    return IUP_DEFAULT;
+}
+
 int btn_open_cb(void)
 {
     Ihandle *text_source = IupGetHandle("text_source");
@@ -370,6 +410,8 @@ void Vigenere_Cipher() {
 
     IupSetCallback(item_open, "ACTION", (Icallback)btn_open_cb);
     IupSetCallback(item_exit, "ACTION", (Icallback)btn_exit_cb);
+    IupSetCallback(item_saveas, "ACTION", (Icallback)btn_saveas_cb);
+
 }
 
 int main(int argc, char** argv)
