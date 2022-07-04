@@ -20,6 +20,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <Manifest Include="..\Debug\Vigenere Cipher.exe.manifest" />
+    <Manifest Include="Vigenere Cipher.exe.manifest" />
   </ItemGroup>
 </Project>

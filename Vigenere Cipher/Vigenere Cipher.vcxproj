@@ -73,12 +73,12 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <IncludePath>$(SolotionDir)External Resources\iup\include;$(IncludePath)</IncludePath>
     <EmbedManifest>true</EmbedManifest>
-    <GenerateManifest>true</GenerateManifest>
+    <GenerateManifest>false</GenerateManifest>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <IncludePath>$(SolotionDir)External Resources\iup\include;$(IncludePath)</IncludePath>
     <EmbedManifest>true</EmbedManifest>
-    <GenerateManifest>true</GenerateManifest>
+    <GenerateManifest>false</GenerateManifest>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -95,7 +95,7 @@
       <AdditionalLibraryDirectories>$(SolutionDir)\External Resources\iup\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>iup.lib;legacy_stdio_definitions.lib;Kernel32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <EntryPointSymbol>mainCRTStartup</EntryPointSymbol>
-      <AdditionalManifestDependencies>%(AdditionalManifestDependencies)</AdditionalManifestDependencies>
+      <AdditionalManifestDependencies>C:\Users\Admin\source\repos\bp82125\Vigenere-Cipher\Vigenere Cipher\Vigenere Cipher.exe.manifest</AdditionalManifestDependencies>
     </Link>
     <Manifest>
       <EnableDpiAwareness>true</EnableDpiAwareness>
@@ -103,7 +103,13 @@
       </AdditionalManifestFiles>
       <OutputManifestFile>
       </OutputManifestFile>
+      <InputResourceManifests>
+      </InputResourceManifests>
     </Manifest>
+    <ManifestResourceCompile>
+      <ResourceOutputFileName>
+      </ResourceOutputFileName>
+    </ManifestResourceCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -124,7 +130,7 @@
       <AdditionalLibraryDirectories>$(SolutionDir)\External Resources\iup\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>iup.lib;legacy_stdio_definitions.lib;Kernel32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <EntryPointSymbol>mainCRTStartup</EntryPointSymbol>
-      <AdditionalManifestDependencies>%(AdditionalManifestDependencies)</AdditionalManifestDependencies>
+      <AdditionalManifestDependencies>C:\Users\Admin\source\repos\bp82125\Vigenere-Cipher\Vigenere Cipher\Vigenere Cipher.exe.manifest</AdditionalManifestDependencies>
     </Link>
     <Manifest>
       <EnableDpiAwareness>true</EnableDpiAwareness>
@@ -132,7 +138,13 @@
       </AdditionalManifestFiles>
       <OutputManifestFile>
       </OutputManifestFile>
+      <InputResourceManifests>
+      </InputResourceManifests>
     </Manifest>
+    <ManifestResourceCompile>
+      <ResourceOutputFileName>
+      </ResourceOutputFileName>
+    </ManifestResourceCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -166,7 +178,10 @@
     <ClCompile Include="main.c" />
   </ItemGroup>
   <ItemGroup>
-    <Manifest Include="..\Debug\Vigenere Cipher.exe.manifest" />
+    <Manifest Include="Vigenere Cipher.exe.manifest">
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</DeploymentContent>
+    </Manifest>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
