@@ -73,12 +73,12 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <IncludePath>$(SolotionDir)External Resources\iup\include;$(IncludePath)</IncludePath>
     <EmbedManifest>true</EmbedManifest>
-    <GenerateManifest>false</GenerateManifest>
+    <GenerateManifest>true</GenerateManifest>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <IncludePath>$(SolotionDir)External Resources\iup\include;$(IncludePath)</IncludePath>
     <EmbedManifest>true</EmbedManifest>
-    <GenerateManifest>false</GenerateManifest>
+    <GenerateManifest>true</GenerateManifest>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -95,7 +95,8 @@
       <AdditionalLibraryDirectories>$(SolutionDir)\External Resources\iup\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>iup.lib;legacy_stdio_definitions.lib;Kernel32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <EntryPointSymbol>mainCRTStartup</EntryPointSymbol>
-      <AdditionalManifestDependencies>C:\Users\Admin\source\repos\bp82125\Vigenere-Cipher\Vigenere Cipher\Vigenere Cipher.exe.manifest</AdditionalManifestDependencies>
+      <AdditionalManifestDependencies>
+      </AdditionalManifestDependencies>
     </Link>
     <Manifest>
       <EnableDpiAwareness>true</EnableDpiAwareness>
@@ -130,7 +131,8 @@
       <AdditionalLibraryDirectories>$(SolutionDir)\External Resources\iup\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>iup.lib;legacy_stdio_definitions.lib;Kernel32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <EntryPointSymbol>mainCRTStartup</EntryPointSymbol>
-      <AdditionalManifestDependencies>C:\Users\Admin\source\repos\bp82125\Vigenere-Cipher\Vigenere Cipher\Vigenere Cipher.exe.manifest</AdditionalManifestDependencies>
+      <AdditionalManifestDependencies>
+      </AdditionalManifestDependencies>
     </Link>
     <Manifest>
       <EnableDpiAwareness>true</EnableDpiAwareness>
