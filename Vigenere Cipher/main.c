@@ -296,7 +296,9 @@ void Vigenere_Cipher() {
     Ihandle *frame_encrypt, *frame_keyword, *frame_res;
     Ihandle *item_open, *item_saveas, *item_exit;
     Ihandle *file_menu, *sub1_menu, *main_menu;
+    Ihandle *toggle;
 
+    toggle = IupToggle("Random", NULL);
     //khai báo text box
 
     text_keyword = IupText(NULL);
@@ -312,7 +314,7 @@ void Vigenere_Cipher() {
     // khai báo các khung
 
     frame_encrypt = IupFrame(text_source);
-    frame_keyword = IupFrame(text_keyword);
+    frame_keyword = IupFrame(IupHbox(text_keyword, toggle, NULL));
     frame_res = IupFrame(text_res);
 
     //khai báo các phần tử menu
