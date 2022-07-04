@@ -9,6 +9,7 @@
 - Có thể khởi tạo keyword ngẫu nhiên <br />
 - Thêm nút clear có thể xoá hết tất cả kí tự <br />
 - Đọc và mã hoá file .txt, lưu output <br />
+- Thêm icon vào các nút chức năng, thêm logo vào phần mềm <br />
 - Thêm dark mode <br />
 ## Cách mã hoá
   Giả sử với một chuỗi cho trước sau:
