@@ -1,6 +1,6 @@
 ﻿#define _CRT_SECURE_NO_WARNINGS
 
-// huy đẹp trai hơn ân
+// ntr is my morning routine
 #include <stdlib.h>
 #include <iup.h>
 #include <stdio.h>
