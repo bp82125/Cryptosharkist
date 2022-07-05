@@ -1,6 +1,5 @@
 ﻿#define _CRT_SECURE_NO_WARNINGS
 
-// huy đẹp trai hơn ân
 #include <stdlib.h>
 #include <iup.h>
 #include <stdio.h>
@@ -8,6 +7,7 @@
 #include <malloc.h>
 #include <time.h>
 
+// test vigenere
 /******************************-Xử lí chuỗi-*********************************/
 
 char* read_file(const char* filename)
