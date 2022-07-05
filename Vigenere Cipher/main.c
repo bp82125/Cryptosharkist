@@ -1,6 +1,6 @@
 ﻿#define _CRT_SECURE_NO_WARNINGS
 
-// huy đẹp trai
+// huy đẹp trai hơn ân
 #include <stdlib.h>
 #include <iup.h>
 #include <stdio.h>
