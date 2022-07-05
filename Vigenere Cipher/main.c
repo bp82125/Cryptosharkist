@@ -408,16 +408,13 @@ int btn_encrypt_cb(Ihandle* self) {
         IupSetAttribute(text_source, "MULTILINE", "YES");
         IupSetAttribute(text_source, "EXPAND", "YES");
         IupSetAttribute(text_source, "VISIBLELINES", "5");
-        IupSetAttribute(text_source, "NAME", "TEXT_SOURCE");
 
         IupSetAttribute(text_res, "MULTILINE", "YES");
         IupSetAttribute(text_res, "EXPAND", "YES");
         IupSetAttribute(text_res, "VISIBLELINES", "3");
-        IupSetAttribute(text_res, "NAME", "TEXT_RES");
 
         IupSetAttribute(text_keyword, "MULTILINE", "NO");
         IupSetAttribute(text_keyword, "EXPAND", "HORIZONTAL");
-        IupSetAttribute(text_keyword, "NAME", "TEXT_KEYWORD");
 
         //tạo các handle để các text box có thể xài global
 
