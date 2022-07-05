@@ -41,21 +41,14 @@ char* read_file(const char* filename)
     return str;
 }
 /*Hàm tạo keyword random*/
-char* random_keyword() {
-    srand(time(NULL));   // Initialization, should only be called once.
-    char* keyword;
-    int keyword_num = (rand() % (20 - 10 + 1)) + 10; // Tạo số chữ trong keyword(10-20)
-    keyword = (char*)malloc(sizeof(char) * (keyword_num + 1));
-    for (int i = 0; i < keyword_num; i++) {
+
+void random_keyword(char* keyword, int len) {
+    for (int i = 0; i < len; i++) {
         keyword[i] = (rand() % ('z' - 'a' + 1)) + 'a';
     }
-    char str[21];
-    for (int i = 0; i < keyword_num; i++) {
-        str[i] = keyword[i];
-    }
-    free(keyword);
-    return str;
+    keyword[len] = '\0';
 }
+
 /* hàm kiểm tra keyword hợp lệ */
 int keyword_check(char keyword[]) {
     int n = strlen(keyword);
@@ -164,12 +157,20 @@ int btn_exit_cb(Ihandle* self) {
 int btn_cancel_cb(Ihandle* self) {
     return IUP_CLOSE;
 }
-/*Nút tạo keyword random*/
-// qua error list coi cho le
+
+/* Nút tạo keyword random */
+
 int btn_create_random_keyword_cb(Ihandle* self) {
     Ihandle* text_keyword;
     text_keyword = IupGetHandle("text_keyword");
-    IupSetAttribute(text_keyword, "VALUE", random_keyword());
+    
+    char* keyword;
+    int len = (rand() % (20 - 10 + 1)) + 10;
+    keyword = (char*)malloc(sizeof(char) * (len + 1));
+    random_keyword(keyword, len);
+
+    IupSetAttribute(text_keyword, "VALUE", keyword);
+    free(keyword);
     return IUP_CLOSE;
 }
 /* nút clear */
@@ -185,11 +186,11 @@ int btn_clear_cb(Ihandle* self) {
     IupSetAttribute(text_source, "VALUE", NULL);
     IupSetAttribute(text_keyword, "VALUE", NULL);
     IupSetAttribute(text_res, "VALUE", NULL);
-    //    return IUP_DEFAULT;
+    return IUP_DEFAULT;
 }
 
 /* nút encrypt */
-int btn_encrypt_cb(Ihandle* self/*, Ihandle* dlg_for_rdkw, Ihandle* vbox_for_rdkw */) {
+int btn_encrypt_cb(Ihandle* self) {
     Ihandle* text_res;
     Ihandle* text_source;
     Ihandle* text_keyword;
@@ -206,21 +207,34 @@ int btn_encrypt_cb(Ihandle* self/*, Ihandle* dlg_for_rdkw, Ihandle* vbox_for_rdk
         return IUP_DEFAULT;
     }
 
-    // Nếu keyword_len = 0, tạo bảng cảnh báo 
+    char* source = (char*)malloc(sizeof(char) * (source_len + 1));
+    char* keyword = (char*)malloc(sizeof(char) * (keyword_len + 1));
+    char* res = (char*)malloc(sizeof(char) * (source_len + 1));
+
+    sprintf(keyword, "%s", IupGetAttribute(text_keyword, "VALUE"));
+
+    if (keyword_check(keyword) == 0) {
+
+        IupMessage("Error!", "Keyword is not suitable");
+
+        return IUP_DEFAULT;
+
+    }
+
     if (keyword_len == 0) {
+       
         Ihandle* button, * button_2, * label, * dlg, * vbox;
 
-
-        label = IupLabel("Keyword hasn't been entered. Create random keyword?");
+        label = IupLabel("You haven't entered any keyword. Do you want to create a random one ?");
         IupSetAttribute(label, "PADDING", "10x20");
         button = IupButton("OK", NULL);
         button_2 = IupButton("Cancel", NULL);
         IupSetAttribute(button, "PADDING", "30x2");
+        IupSetAttribute(button_2, "PADDING", "30x2");
 
         vbox = IupVbox(
             label,
-            button,
-            button_2,
+            IupHbox(button, button_2, NULL),
             NULL);
         IupSetAttribute(vbox, "ALIGNMENT", "ARIGHT");
         IupSetAttribute(vbox, "GAP", "10");
@@ -239,24 +253,8 @@ int btn_encrypt_cb(Ihandle* self/*, Ihandle* dlg_for_rdkw, Ihandle* vbox_for_rdk
         IupMainLoop();
         IupDestroy(dlg); //Hủy bản cảnh báo
         return IUP_DEFAULT;
-
-
     }
 
-
-    char* source = (char*)malloc(sizeof(char) * (source_len + 1));
-    char* keyword = (char*)malloc(sizeof(char) * (keyword_len + 1));
-    char* res = (char*)malloc(sizeof(char) * (source_len + 1));
-
-    sprintf(keyword, "%s", IupGetAttribute(text_keyword, "VALUE"));
-
-    if (keyword_check(keyword) == 0) {
-
-        IupMessage("Error!", "Keyword is not suitable");
-
-        return IUP_DEFAULT;
-
-    }
         sprintf(source, "%s", IupGetAttribute(text_source, "VALUE"));
         sprintf(res, "%s", IupGetAttribute(text_res, "VALUE"));
 
@@ -317,47 +315,20 @@ int btn_encrypt_cb(Ihandle* self/*, Ihandle* dlg_for_rdkw, Ihandle* vbox_for_rdk
         return IUP_DEFAULT;
     }
 
-    int btn_help_cb(Ihandle* self) {
-        Ihandle *fill,* label1, *label2,*label3, * vbox, * link, * dlg;
+    /*********************-Hàm chính trong chương trình-***********************/
 
-        fill = IupFill();
-        label1 = IupLabel("A simple a Vigenère Cipher encoder program written in C\nVersion: beta-0.1.2");
-        label2 = IupLabel("Home:");
-        label3 = IupLabel("Credit:\nbp82125\nThienAn923");
-        link = IupLink("https://github.com/bp82125/Vigenere-Cipher", "github.com/bp82125/Vigenere-Cipher");
-        vbox = IupVbox(
-            label1,
-            IupHbox(label2, link, NULL),
-            label3,
-            NULL
-        );
+    int main(int argc, char** argv)
+    {
+        srand(time(NULL));
 
-        IupSetAttribute(label1, "ALIGNMENT", "ALEFT");
-        IupSetAttribute(label3, "ALIGNMENT", "ACENTER");
-
-        IupSetAttribute(vbox, "ALIGNMENT", "ACENTER");
-        IupSetAttribute(vbox, "GAP", "5");
-        IupSetAttribute(vbox, "MARGIN", "10x10");
-
-        dlg = IupDialog(vbox);
-        IupSetAttribute(dlg, "TITLE", "About");
-        IupSetAttribute(dlg, "MAXBOX", "No");
-        IupSetAttribute(dlg, "MINBOX", "No");
-
-        IupShowXY(dlg, IUP_CENTER, IUP_CENTER);
-        IupMainLoop();
-        IupDestroy(dlg); //Hủy bản cảnh báo
-
-        return IUP_CLOSE;
-    }
-
-    void Vigenere_Cipher() {
         Ihandle* dlg, * element_box;
         Ihandle* text_source, * text_keyword, * text_res;
         Ihandle* btn_encrypt, * btn_descrypt, * btn_clear;
         Ihandle* frame_encrypt, * frame_keyword, * frame_res;
         Ihandle* item_open, * item_saveas, * item_exit;
         Ihandle* file_menu, * sub1_menu, * main_menu;
+
+        IupOpen(&argc, &argv);
 
         //khai báo text box
 
@@ -435,13 +406,16 @@ int btn_encrypt_cb(Ihandle* self/*, Ihandle* dlg_for_rdkw, Ihandle* vbox_for_rdk
         IupSetAttribute(text_source, "MULTILINE", "YES");
         IupSetAttribute(text_source, "EXPAND", "YES");
         IupSetAttribute(text_source, "VISIBLELINES", "5");
+        IupSetAttribute(text_source, "NAME", "TEXT_SOURCE");
 
         IupSetAttribute(text_res, "MULTILINE", "YES");
         IupSetAttribute(text_res, "EXPAND", "YES");
         IupSetAttribute(text_res, "VISIBLELINES", "3");
+        IupSetAttribute(text_res, "NAME", "TEXT_RES");
 
         IupSetAttribute(text_keyword, "MULTILINE", "NO");
         IupSetAttribute(text_keyword, "EXPAND", "HORIZONTAL");
+        IupSetAttribute(text_keyword, "NAME", "TEXT_KEYWORD");
 
         //tạo các handle để các text box có thể xài global
 
@@ -472,13 +446,6 @@ int btn_encrypt_cb(Ihandle* self/*, Ihandle* dlg_for_rdkw, Ihandle* vbox_for_rdk
 
         IupSetCallback(item_open, "ACTION", (Icallback)btn_open_cb);
         IupSetCallback(item_exit, "ACTION", (Icallback)btn_exit_cb);
-    }
-
-    int main(int argc, char** argv)
-    {
-        IupOpen(&argc, &argv);
-
-        Vigenere_Cipher();
 
         IupMainLoop();
 
