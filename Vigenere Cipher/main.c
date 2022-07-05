@@ -1,5 +1,6 @@
 ﻿#define _CRT_SECURE_NO_WARNINGS
 
+// yasuo
 #include <stdlib.h>
 #include <iup.h>
 #include <stdio.h>
