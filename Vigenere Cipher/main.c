@@ -1,5 +1,8 @@
 ﻿#define _CRT_SECURE_NO_WARNINGS
 
+
+// ntr is my morning routine
+
 #include <stdlib.h>
 #include <iup.h>
 #include <stdio.h>
