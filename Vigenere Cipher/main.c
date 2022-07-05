@@ -205,7 +205,42 @@ int btn_encrypt_cb(Ihandle* self/*, Ihandle* dlg_for_rdkw, Ihandle* vbox_for_rdk
         return IUP_DEFAULT;
     }
 
+    // Nếu keyword_len = 0, tạo bảng cảnh báo 
+    if (keyword_len == 0) {
+        Ihandle* button, * button_2, * label, * dlg, * vbox;
 
+
+        label = IupLabel("Keyword hasn't been entered. Create random keyword?");
+        IupSetAttribute(label, "PADDING", "10x20");
+        button = IupButton("OK", NULL);
+        button_2 = IupButton("Cancel", NULL);
+        IupSetAttribute(button, "PADDING", "30x2");
+
+        vbox = IupVbox(
+            label,
+            button,
+            button_2,
+            NULL);
+        IupSetAttribute(vbox, "ALIGNMENT", "ARIGHT");
+        IupSetAttribute(vbox, "GAP", "10");
+        IupSetAttribute(vbox, "MARGIN", "10x10");
+
+        dlg = IupDialog(vbox);
+        IupSetAttribute(dlg, "TITLE", "Error!");
+        IupSetAttribute(dlg, "MAXBOX", "No");
+        IupSetAttribute(dlg, "MINBOX", "No");
+
+        /* Registers callbacks */
+        IupSetCallback(button, "ACTION", (Icallback)btn_create_random_keyword_cb);
+        IupSetCallback(button_2, "ACTION", (Icallback)btn_cancel_cb);
+
+        IupShowXY(dlg, IUP_CENTER, IUP_CENTER);
+        IupMainLoop();
+        IupDestroy(dlg); //Hủy bản cảnh báo
+        return IUP_DEFAULT;
+
+
+    }
 
 
     char* source = (char*)malloc(sizeof(char) * (source_len + 1));
