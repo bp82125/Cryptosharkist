@@ -1,6 +1,6 @@
 ﻿#define _CRT_SECURE_NO_WARNINGS
 
-// yasuo
+// huy đẹp trai
 #include <stdlib.h>
 #include <iup.h>
 #include <stdio.h>
