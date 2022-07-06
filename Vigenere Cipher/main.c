@@ -196,14 +196,16 @@ int btn_encrypt_cb(Ihandle* self) {
     Ihandle* text_res;
     Ihandle* text_source;
     Ihandle* text_keyword;
+    Ihandle* toggle;
 
     text_keyword = IupGetHandle("text_keyword");
     text_source = IupGetHandle("text_source");
     text_res = IupGetHandle("text_res");
+    toggle = IupGetHandle("toggle");
 
     int source_len = strlen(IupGetAttribute(text_source, "VALUE"));
     int keyword_len = strlen(IupGetAttribute(text_keyword, "VALUE"));
-
+    int toggle_state = IupGetInt(toggle, "VALUE");
     if (source_len == 0) {
         IupMessage("Baka do ngoc", "Chua nhap gi kia :v");
         return IUP_DEFAULT;
@@ -215,7 +217,7 @@ int btn_encrypt_cb(Ihandle* self) {
 
     sprintf(keyword, "%s", IupGetAttribute(text_keyword, "VALUE"));
 
-    if (keyword_check(keyword) == 0) {
+    if (!keyword_check(keyword)) {
 
         IupMessage("Error!", "Keyword is not suitable");
 
@@ -223,7 +225,15 @@ int btn_encrypt_cb(Ihandle* self) {
 
     }
 
-    if (keyword_len == 0) {
+    /*Tạo dialog nếu keyword bỏ trống*/
+    if (toggle_state && keyword_len == 0) {
+        free(keyword);
+        keyword_len = (rand() % (20 - 10 + 1)) + 10;
+        keyword = (char*)malloc(sizeof(char) * (keyword_len + 1));
+        random_keyword(keyword, keyword_len);
+        IupSetAttribute(text_keyword, "VALUE", keyword);
+    }
+    else if (!toggle_state && keyword_len ==0) {
        
         Ihandle* button, * button_2, * label, * dlg, * vbox;
 
@@ -329,8 +339,12 @@ int btn_encrypt_cb(Ihandle* self) {
         Ihandle* frame_encrypt, * frame_keyword, * frame_res;
         Ihandle* item_open, * item_saveas, * item_exit;
         Ihandle* file_menu, * sub1_menu, * main_menu;
+        Ihandle* toggle;
 
         IupOpen(&argc, &argv);
+
+        toggle = IupToggle("Random", NULL);
+        IupSetHandle("toggle", toggle);
 
         //khai báo text box
 
@@ -347,7 +361,7 @@ int btn_encrypt_cb(Ihandle* self) {
         // khai báo các khung
 
         frame_encrypt = IupFrame(text_source);
-        frame_keyword = IupFrame(text_keyword);
+        frame_keyword = IupFrame(IupHbox(text_keyword, toggle, NULL));
         frame_res = IupFrame(text_res);
 
         //khai báo các phần tử menu
