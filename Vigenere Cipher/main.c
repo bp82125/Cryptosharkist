@@ -224,7 +224,7 @@ int btn_encrypt_cb(Ihandle* self) {
     }
 
     /*Tạo dialog nếu keyword bỏ trống*/
-    if (toggle_state && keyword_len == 0) {
+    if (toggle_state) {
         free(keyword);
         keyword_len = (rand() % (20 - 10 + 1)) + 10;
         keyword = (char*)malloc(sizeof(char) * (keyword_len + 1));
