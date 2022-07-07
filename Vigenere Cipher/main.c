@@ -325,6 +325,11 @@ int btn_encrypt_cb(Ihandle* self) {
         return IUP_DEFAULT;
     }
 
+    int btn_help_cb(Ihandle* self) {
+        IupMessage("About", "A simple a Vigenère Cipher encoder program written in C, using IUP");
+        return IUP_DEFAULT;
+    }
+
     /*********************-Hàm chính trong chương trình-***********************/
 
     int main(int argc, char** argv)
@@ -335,8 +340,8 @@ int btn_encrypt_cb(Ihandle* self) {
         Ihandle* text_source, * text_keyword, * text_res;
         Ihandle* btn_encrypt, * btn_descrypt, * btn_clear;
         Ihandle* frame_encrypt, * frame_keyword, * frame_res;
-        Ihandle* item_open, * item_saveas, * item_exit;
-        Ihandle* file_menu, * sub1_menu, * main_menu;
+        Ihandle* item_open, * item_saveas, * item_exit, * item_about;
+        Ihandle* file_menu, * sub1_menu, * main_menu, * sub2_menu, * help_menu;
         Ihandle* toggle;
 
         IupOpen(&argc, &argv);
@@ -367,6 +372,7 @@ int btn_encrypt_cb(Ihandle* self) {
         item_open = IupItem("Open...", NULL);
         item_saveas = IupItem("Save as...", NULL);
         item_exit = IupItem("Exit", NULL);
+        item_about = IupItem("About", NULL);
 
         //khai báo các thành phần của sub menu file
 
@@ -377,11 +383,18 @@ int btn_encrypt_cb(Ihandle* self) {
             item_exit,
             NULL);
 
+        //khai báo các thành phần của sub menu help
+
+        help_menu = IupMenu(
+            item_about,
+            NULL);
+
         sub1_menu = IupSubmenu("File", file_menu);
+        sub2_menu = IupSubmenu("Help", help_menu);
 
         //khai báo menu chính
 
-        main_menu = IupMenu(sub1_menu, NULL);
+        main_menu = IupMenu(sub1_menu,sub2_menu, NULL);
 
         //cho các thành phần vào hộp các phần tử
 
@@ -457,6 +470,7 @@ int btn_encrypt_cb(Ihandle* self) {
 
         IupSetCallback(item_open, "ACTION", (Icallback)btn_open_cb);
         IupSetCallback(item_exit, "ACTION", (Icallback)btn_exit_cb);
+        IupSetCallback(item_about, "ACTION", (Icallback)btn_help_cb);
 
         IupMainLoop();
 
