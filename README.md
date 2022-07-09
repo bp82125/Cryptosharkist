@@ -10,6 +10,7 @@
 ## Mục tiêu tương lai
 - Thêm icon vào các nút chức năng, thêm logo vào phần mềm <br />
 - Thêm dark mode <br />
+- Thêm list cho phép mã hoá nhiều loại mã khác nhau
 ## Cách mã hoá
   Giả sử với một chuỗi cho trước sau:
   ```
