@@ -5,10 +5,9 @@
 - Có thể mã hoá chuỗi với cả kí tự thường, hoa và các kí tự đặc biệt khác <br />
 - Mã hoá không giới hạn số lượng kí tự của chuỗi <br />
 - Giao diện đồ hoạ thân thiện với người dùng, sử dụng [IUP](https://www.tecgraf.puc-rio.br/iup/) <br />
+- Có thể khởi tạo keyword ngẫu nhiên và tạo keyword ngẫu nhiên với nhiều input liên tiếp <br />
+- Đọc và mã hoá file .txt, lưu output cũng dưới định dạng file .txt <br />
 ## Mục tiêu tương lai
-- Có thể khởi tạo keyword ngẫu nhiên <br />
-- Thêm nút clear có thể xoá hết tất cả kí tự <br />
-- Đọc và mã hoá file .txt, lưu output <br />
 - Thêm icon vào các nút chức năng, thêm logo vào phần mềm <br />
 - Thêm dark mode <br />
 ## Cách mã hoá
