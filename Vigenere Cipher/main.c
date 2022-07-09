@@ -328,8 +328,38 @@ int btn_encrypt_cb(Ihandle* self) {
     }
 
     int btn_help_cb(Ihandle* self) {
-        IupMessage("About", "A simple a Vigenère Cipher encoder program written in C, using IUP");
-        return IUP_DEFAULT;
+
+        Ihandle *fill,* label1, *label2,*label3, * vbox, * link, * dlg;
+
+        fill = IupFill();
+        label1 = IupLabel("A simple a Vigenère Cipher encoder program written in C\nVersion: beta-0.1.2");
+        label2 = IupLabel("Home:");
+        label3 = IupLabel("Credit:\nbp82125\nThienAn923");
+        link = IupLink("https://github.com/bp82125/Vigenere-Cipher", "github.com/bp82125/Vigenere-Cipher");
+        vbox = IupVbox(
+            label1,
+            IupHbox(label2, link, NULL),
+            label3,
+            NULL
+        );
+
+        IupSetAttribute(label1, "ALIGNMENT", "ALEFT");
+        IupSetAttribute(label3, "ALIGNMENT", "ACENTER");
+
+        IupSetAttribute(vbox, "ALIGNMENT", "ACENTER");
+        IupSetAttribute(vbox, "GAP", "5");
+        IupSetAttribute(vbox, "MARGIN", "10x10");
+
+        dlg = IupDialog(vbox);
+        IupSetAttribute(dlg, "TITLE", "About");
+        IupSetAttribute(dlg, "MAXBOX", "No");
+        IupSetAttribute(dlg, "MINBOX", "No");
+
+        IupShowXY(dlg, IUP_CENTER, IUP_CENTER);
+        IupMainLoop();
+        IupDestroy(dlg); //Hủy bản cảnh báo
+
+        return IUP_CLOSE;
     }
 
     /*********************-Hàm chính trong chương trình-***********************/
