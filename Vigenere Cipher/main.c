@@ -371,9 +371,8 @@ int btn_encrypt_cb(Ihandle* self) {
     int btn_help_cb(Ihandle* self) {
         IupMessage("About", "A simple a Vigenère Cipher encoder program written in C, using IUP");
         return IUP_DEFAULT;
-    }
 
-        Ihandle *fill,* label1, *label2,*label3, * vbox, * link, * dlg;
+        Ihandle* fill, * label1, * label2, * label3, * vbox, * link, * dlg;
 
         fill = IupFill();
         label1 = IupLabel("A simple a Vigenère Cipher encoder program written in C\nVersion: beta-0.1.2");
@@ -398,12 +397,7 @@ int btn_encrypt_cb(Ihandle* self) {
         IupSetAttribute(dlg, "TITLE", "About");
         IupSetAttribute(dlg, "MAXBOX", "No");
         IupSetAttribute(dlg, "MINBOX", "No");
-
-    /*********************-Hàm chính trong chương trình-***********************/
-
-    int main(int argc, char** argv)
-    {
-        srand(time(NULL));
+    }
 
     /*********************-Hàm chính trong chương trình-***********************/
 
