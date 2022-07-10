@@ -7,6 +7,7 @@
 #include <string.h>
 #include <malloc.h>
 #include <time.h>
+#include "icon.h"
 
 // test vigenere
 /******************************-Xử lí chuỗi-*********************************/
@@ -40,6 +41,26 @@ char* read_file(const char* filename)
     fclose(file);
     return str;
 }
+
+/*Hàm lưu file*/
+
+void write_file(const char* filename, const char* str, int count)
+{
+    FILE* file = fopen(filename, "w");
+    if (!file)
+    {
+        IupMessagef("Error", "Can't open file: %s", filename);
+        return;
+    }
+
+    fwrite(str, 1, count, file);
+
+    if (ferror(file))
+        IupMessagef("Error", "Fail when writing to file: %s", filename);
+
+    fclose(file);
+}
+
 /*Hàm tạo keyword random*/
 
 void random_keyword(char* keyword, int len) {
@@ -125,6 +146,29 @@ void descrypt(char source[], char res[]) {
 /****************************-Xử lí các nút bấm-*****************************/
 
 /*nút mở và đọc file */
+
+int btn_saveas_cb(void)
+{
+    Ihandle* text_res = IupGetHandle("text_res");
+    Ihandle* filedlg = IupFileDlg();
+    IupSetAttribute(filedlg, "DIALOGTYPE", "SAVE");
+    IupSetAttributes(filedlg, "FILTER = \"*.txt\"");
+
+    IupPopup(filedlg, IUP_CENTER, IUP_CENTER);
+
+    if (IupGetInt(filedlg, "STATUS") != -1)
+    {
+        char* filename = IupGetAttribute(filedlg, "VALUE");
+        strncat(filename, ".txt", 5);
+        char* str = IupGetAttribute(text_res, "VALUE");
+        int count = IupGetInt(text_res, "COUNT");
+        write_file(filename, str, count);
+    }
+
+    IupDestroy(filedlg);
+    return IUP_DEFAULT;
+}
+
 int btn_open_cb(void)
 {
     Ihandle* text_source = IupGetHandle("text_source");
@@ -336,15 +380,18 @@ int btn_encrypt_cb(Ihandle* self) {
     {
         srand(time(NULL));
 
-        Ihandle* dlg, * element_box;
+        Ihandle* dlg, * element_box, * vbox;
         Ihandle* text_source, * text_keyword, * text_res;
         Ihandle* btn_encrypt, * btn_descrypt, * btn_clear;
         Ihandle* frame_encrypt, * frame_keyword, * frame_res;
         Ihandle* item_open, * item_saveas, * item_exit, * item_about;
         Ihandle* file_menu, * sub1_menu, * main_menu, * sub2_menu, * help_menu;
         Ihandle* toggle;
+        Ihandle* toolbar_hb, * btn_open, * btn_save, * btn_darkmode, * fill;
 
         IupOpen(&argc, &argv);
+
+        create_images_icon();
 
         toggle = IupToggle("Random", NULL);
         IupSetHandle("toggle", toggle);
@@ -361,6 +408,25 @@ int btn_encrypt_cb(Ihandle* self) {
         btn_descrypt = IupButton("Descrypt", NULL);
         btn_clear = IupButton("Clear", NULL);
 
+        //khai báo và điều chỉnh các nút trên toolbar
+        fill = IupFill();
+        IupSetAttribute(fill, "SIZE", "4");
+
+        btn_open = IupButton(NULL, NULL);
+        btn_save = IupButton(NULL, NULL);
+        btn_darkmode = IupButton(NULL, NULL);
+
+        IupSetAttribute(btn_open, "IMAGE", "OpenFolder");
+        IupSetAttribute(btn_open, "FLAT", "Yes");
+        IupSetAttribute(btn_open, "CANFOCUS", "No");
+
+        IupSetAttribute(btn_save, "IMAGE", "SaveAs");
+        IupSetAttribute(btn_save, "FLAT", "Yes");
+        IupSetAttribute(btn_save, "CANFOCUS", "No");
+
+        IupSetAttribute(btn_darkmode, "IMAGE", "DarkTheme");
+        IupSetAttribute(btn_darkmode, "FLAT", "Yes");
+        IupSetAttribute(btn_darkmode, "CANFOCUS", "No");
         // khai báo các khung
 
         frame_encrypt = IupFrame(text_source);
@@ -396,6 +462,18 @@ int btn_encrypt_cb(Ihandle* self) {
 
         main_menu = IupMenu(sub1_menu,sub2_menu, NULL);
 
+        //cho các thành phần vào toolbar
+
+        toolbar_hb = IupHbox(
+            fill,
+            btn_open,
+            btn_save,
+            IupSetAttributes(IupLabel(NULL), "SEPARATOR=VERTICAL"),
+            btn_darkmode,
+            NULL
+        );
+
+
         //cho các thành phần vào hộp các phần tử
 
         element_box = IupVbox(
@@ -410,6 +488,11 @@ int btn_encrypt_cb(Ihandle* self) {
             NULL
         );
 
+        vbox = IupVbox(
+            toolbar_hb,
+            element_box,
+            NULL
+        );
         //thêm tựa đề cho các khung
 
         IupSetAttribute(frame_encrypt, "TITLE", "Enter plain text/cipher text here:");
@@ -417,6 +500,10 @@ int btn_encrypt_cb(Ihandle* self) {
         IupSetAttribute(frame_res, "TITLE", "Result:");
 
         //điều chỉnh hộp phần tử
+
+        IupSetAttribute(toolbar_hb, "ALIGNMENT", "ALEFT");
+        IupSetAttribute(toolbar_hb, "MARGIN", "5x5");
+        IupSetAttribute(toolbar_hb, "GAP", "2");
 
         IupSetAttribute(element_box, "ALIGNMENT", "ACENTER");
         IupSetAttribute(element_box, "GAP", "10");
@@ -449,7 +536,7 @@ int btn_encrypt_cb(Ihandle* self) {
 
         // thêm hộp phần tử vào dialog
         dlg = IupDialog(
-            element_box
+            vbox
         );
 
         //điều chỉnh dialog
@@ -471,6 +558,12 @@ int btn_encrypt_cb(Ihandle* self) {
         IupSetCallback(item_open, "ACTION", (Icallback)btn_open_cb);
         IupSetCallback(item_exit, "ACTION", (Icallback)btn_exit_cb);
         IupSetCallback(item_about, "ACTION", (Icallback)btn_help_cb);
+        IupSetCallback(item_saveas, "ACTION", (Icallback)btn_saveas_cb);
+
+        //gán event cho các nút trong toolbar
+
+        IupSetCallback(btn_open, "ACTION", (Icallback)btn_open_cb);
+        IupSetCallback(btn_save, "ACTION", (Icallback)btn_saveas_cb);
 
         IupMainLoop();
 

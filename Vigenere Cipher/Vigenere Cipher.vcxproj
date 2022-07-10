@@ -179,10 +179,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="icon.c" />
     <ClCompile Include="main.c" />
   </ItemGroup>
   <ItemGroup>
     <Manifest Include="Vigenere Cipher.exe.manifest" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="icon.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
