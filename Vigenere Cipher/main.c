@@ -476,4 +476,4 @@ int btn_encrypt_cb(Ihandle* self) {
 
         IupClose();
         return EXIT_SUCCESS;
-    }
+}
