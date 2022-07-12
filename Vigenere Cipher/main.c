@@ -399,6 +399,18 @@ int btn_encrypt_cb(Ihandle* self) {
         IupSetAttribute(dlg, "MINBOX", "No");
     }
 
+    int toggle_cb(Ihandle* ih, int state) {
+        Ihandle* toggle = IupGetHandle("toggle_darkmode");
+        int toggle_state = IupGetInt(toggle, "VALUE");
+        if (toggle_state) {
+            IupSetAttribute(toggle, "IMPRESS", "Brightness");
+        }
+        else {
+            IupSetAttribute(toggle, "IMINACTIVE", "Brightness");
+        }
+        return IUP_DEFAULT;
+    }
+
     /*********************-Hàm chính trong chương trình-***********************/
 
     int main(int argc, char** argv)
@@ -412,7 +424,7 @@ int btn_encrypt_cb(Ihandle* self) {
         Ihandle* item_open, * item_saveas, * item_exit, * item_about;
         Ihandle* file_menu, * sub1_menu, * main_menu, * sub2_menu, * help_menu;
         Ihandle* toggle;
-        Ihandle* toolbar_hb, * btn_open, * btn_save, * btn_darkmode, * fill;
+        Ihandle* toolbar_hb, * btn_open, * btn_save, * toggle_darkmode, * fill;
 
         IupOpen(&argc, &argv);
 
@@ -439,7 +451,7 @@ int btn_encrypt_cb(Ihandle* self) {
 
         btn_open = IupButton(NULL, NULL);
         btn_save = IupButton(NULL, NULL);
-        btn_darkmode = IupButton(NULL, NULL);
+        toggle_darkmode = IupToggle(NULL, NULL);
 
         IupSetAttribute(btn_open, "IMAGE", "OpenFolder");
         IupSetAttribute(btn_open, "FLAT", "Yes");
@@ -449,9 +461,10 @@ int btn_encrypt_cb(Ihandle* self) {
         IupSetAttribute(btn_save, "FLAT", "Yes");
         IupSetAttribute(btn_save, "CANFOCUS", "No");
 
-        IupSetAttribute(btn_darkmode, "IMAGE", "DarkTheme");
-        IupSetAttribute(btn_darkmode, "FLAT", "Yes");
-        IupSetAttribute(btn_darkmode, "CANFOCUS", "No");
+        IupSetAttribute(toggle_darkmode, "IMAGE", "DarkTheme");
+        IupSetAttribute(toggle_darkmode, "FLAT", "Yes");
+        IupSetAttribute(toggle_darkmode, "CANFOCUS", "Yes");
+
         // khai báo các khung
 
         frame_encrypt = IupFrame(text_source);
@@ -494,7 +507,7 @@ int btn_encrypt_cb(Ihandle* self) {
             btn_open,
             btn_save,
             IupSetAttributes(IupLabel(NULL), "SEPARATOR=VERTICAL"),
-            btn_darkmode,
+            toggle_darkmode,
             NULL
         );
 
@@ -557,11 +570,13 @@ int btn_encrypt_cb(Ihandle* self) {
         IupSetHandle("text_source", text_source);
         IupSetHandle("text_res", text_res);
         IupSetHandle("text_keyword", text_keyword);
-
+        IupSetHandle("toggle_darkmode", toggle_darkmode);
         // thêm hộp phần tử vào dialog
         dlg = IupDialog(
             vbox
         );
+
+        IupSetHandle("dlg", dlg);
 
         //điều chỉnh dialog
 
@@ -588,7 +603,7 @@ int btn_encrypt_cb(Ihandle* self) {
 
         IupSetCallback(btn_open, "ACTION", (Icallback)btn_open_cb);
         IupSetCallback(btn_save, "ACTION", (Icallback)btn_saveas_cb);
-
+        IupSetCallback(toggle_darkmode, "ACTION", (Icallback)toggle_cb);
         IupMainLoop();
 
         IupClose();
