@@ -369,9 +369,6 @@ int btn_encrypt_cb(Ihandle* self) {
     }
 
     int btn_help_cb(Ihandle* self) {
-        IupMessage("About", "A simple a Vigenère Cipher encoder program written in C, using IUP");
-        return IUP_DEFAULT;
-
         Ihandle* fill, * label1, * label2, * label3, * vbox, * link, * dlg;
 
         fill = IupFill();
@@ -397,6 +394,10 @@ int btn_encrypt_cb(Ihandle* self) {
         IupSetAttribute(dlg, "TITLE", "About");
         IupSetAttribute(dlg, "MAXBOX", "No");
         IupSetAttribute(dlg, "MINBOX", "No");
+        IupShowXY(dlg, IUP_CENTER, IUP_CENTER);
+        IupMainLoop();
+        IupDestroy(dlg);
+        return IUP_CLOSE;
     }
 
     int toggle_cb(Ihandle* ih, int state) {
@@ -478,6 +479,9 @@ int btn_encrypt_cb(Ihandle* self) {
         item_exit = IupItem("Exit", NULL);
         item_about = IupItem("About", NULL);
 
+        IupSetAttribute(item_open, "TITLEIMAGE", "OpenFolder");
+        IupSetAttribute(item_saveas, "TITLEIMAGE", "SaveAs");
+        IupSetAttribute(item_exit, "TITLEIMAGE", "Exit");
         //khai báo các thành phần của sub menu file
 
         file_menu = IupMenu(
@@ -507,6 +511,7 @@ int btn_encrypt_cb(Ihandle* self) {
             btn_open,
             btn_save,
             IupSetAttributes(IupLabel(NULL), "SEPARATOR=VERTICAL"),
+            IupFill(),
             toggle_darkmode,
             NULL
         );
@@ -579,7 +584,6 @@ int btn_encrypt_cb(Ihandle* self) {
         IupSetHandle("dlg", dlg);
 
         //điều chỉnh dialog
-
         IupSetAttribute(dlg, "TITLE", "Vigenère Cipher");
         IupSetAttributeHandle(dlg, "MENU", main_menu);
         IupSetAttribute(dlg, "SIZE", "THIRDx250");
