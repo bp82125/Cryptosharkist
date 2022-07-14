@@ -7,6 +7,7 @@
 #include <malloc.h>
 #include <time.h>
 #include "icon.h"
+#include <iupkey.h>
 
 // test vigenere
 /******************************-Xử lí chuỗi-*********************************/
@@ -368,8 +369,10 @@ int btn_encrypt_cb(Ihandle* self) {
         return IUP_DEFAULT;
     }
 
-    int btn_help_cb(Ihandle* self) {
+    int btn_help_cb(Ihandle* item_about) {
         Ihandle* fill, * label1, * label2, * label3, * vbox, * link, * dlg;
+
+        dlg = (Ihandle*)IupGetAttribute(item_about, "ABOUT_DIALOG");
 
         fill = IupFill();
         label1 = IupLabel("A simple a Vigenère Cipher encoder program written in C\nVersion: beta-0.1.2");
@@ -392,12 +395,14 @@ int btn_encrypt_cb(Ihandle* self) {
 
         dlg = IupDialog(vbox);
         IupSetAttribute(dlg, "TITLE", "About");
-        IupSetAttribute(dlg, "MAXBOX", "No");
-        IupSetAttribute(dlg, "MINBOX", "No");
-        IupShowXY(dlg, IUP_CENTER, IUP_CENTER);
-        IupMainLoop();
+        IupSetAttribute(dlg, "DIALOGFRAME", "Yes");
+        IupSetAttributeHandle(dlg, "PARENTDIALOG", IupGetDialog(item_about));
+
+        IupSetAttribute(item_about, "ABOUT_DIALOG", (char*)dlg);
+        IupPopup(dlg, IUP_CENTER, IUP_CENTER);
         IupDestroy(dlg);
-        return IUP_CLOSE;
+
+        return IUP_DEFAULT;
     }
 
     int toggle_cb(Ihandle* ih, int state) {
@@ -423,7 +428,9 @@ int btn_encrypt_cb(Ihandle* self) {
         Ihandle* btn_encrypt, * btn_descrypt, * btn_clear;
         Ihandle* frame_encrypt, * frame_keyword, * frame_res;
         Ihandle* item_open, * item_saveas, * item_exit, * item_about;
-        Ihandle* file_menu, * sub1_menu, * main_menu, * sub2_menu, * help_menu;
+        Ihandle* item_copy, * item_paste, * item_cut, * item_delete, * item_select_all;
+        Ihandle* file_menu, *edit_menu, * help_menu, * main_menu;
+        Ihandle* sub_file_menu, * sub_about_menu, * sub_edit_menu;
         Ihandle* toggle;
         Ihandle* toolbar_hb, * btn_open, * btn_save, * toggle_darkmode, * fill;
 
@@ -472,16 +479,35 @@ int btn_encrypt_cb(Ihandle* self) {
         frame_keyword = IupFrame(IupHbox(text_keyword, toggle, NULL));
         frame_res = IupFrame(text_res);
 
-        //khai báo các phần tử menu
+        //khai báo các phần tử sub menu file
 
-        item_open = IupItem("Open...", NULL);
-        item_saveas = IupItem("Save as...", NULL);
+        item_open = IupItem("Open...\tCtrl + O", NULL);
+        item_saveas = IupItem("Save as...\t Ctrl + S", NULL);
         item_exit = IupItem("Exit", NULL);
-        item_about = IupItem("About", NULL);
 
         IupSetAttribute(item_open, "TITLEIMAGE", "OpenFolder");
         IupSetAttribute(item_saveas, "TITLEIMAGE", "SaveAs");
         IupSetAttribute(item_exit, "TITLEIMAGE", "Exit");
+
+        //khai báo các phần tử sub menu edit
+
+        item_cut = IupItem("Cut...\tCtrl + X",NULL);
+        item_copy = IupItem("Copy...\tCtrl + C",NULL);
+        item_paste = IupItem("Paste...\tCtrl + V",NULL);
+        item_delete = IupItem("Delete...\tDel",NULL);
+        item_select_all = IupItem("Select All\tCtrl + A", NULL);
+
+        IupSetAttribute(item_cut, "TITLEIMAGE", "Cut");
+        IupSetAttribute(item_copy, "TITLEIMAGE", "Copy");
+        IupSetAttribute(item_paste, "TITLEIMAGE", "Paste");
+        IupSetAttribute(item_delete, "TITLEIMAGE", "Cancel");
+        IupSetAttribute(item_select_all, "TITLEIMAGE", "Select");
+
+        //khai báo các phần tử sub menu help
+
+        item_about = IupItem("About", NULL);
+
+
         //khai báo các thành phần của sub menu file
 
         file_menu = IupMenu(
@@ -491,18 +517,31 @@ int btn_encrypt_cb(Ihandle* self) {
             item_exit,
             NULL);
 
+        //khai báo phần tử của sub menu edit
+
+        edit_menu = IupMenu(
+            item_cut,
+            item_copy,
+            item_paste,
+            item_delete,
+            IupSeparator(),
+            item_select_all,
+            NULL
+        );
+
         //khai báo các thành phần của sub menu help
 
         help_menu = IupMenu(
             item_about,
             NULL);
 
-        sub1_menu = IupSubmenu("File", file_menu);
-        sub2_menu = IupSubmenu("Help", help_menu);
+        sub_file_menu = IupSubmenu("File", file_menu);
+        sub_about_menu = IupSubmenu("Help", help_menu);
+        sub_edit_menu = IupSubmenu("Edit", edit_menu);
 
         //khai báo menu chính
 
-        main_menu = IupMenu(sub1_menu,sub2_menu, NULL);
+        main_menu = IupMenu(sub_file_menu,sub_edit_menu,sub_about_menu, NULL);
 
         //cho các thành phần vào toolbar
 
@@ -576,7 +615,9 @@ int btn_encrypt_cb(Ihandle* self) {
         IupSetHandle("text_res", text_res);
         IupSetHandle("text_keyword", text_keyword);
         IupSetHandle("toggle_darkmode", toggle_darkmode);
+
         // thêm hộp phần tử vào dialog
+
         dlg = IupDialog(
             vbox
         );
@@ -608,6 +649,11 @@ int btn_encrypt_cb(Ihandle* self) {
         IupSetCallback(btn_open, "ACTION", (Icallback)btn_open_cb);
         IupSetCallback(btn_save, "ACTION", (Icallback)btn_saveas_cb);
         IupSetCallback(toggle_darkmode, "ACTION", (Icallback)toggle_cb);
+
+        //định nghĩa các shortcut
+
+        IupSetCallback(dlg, "K_cO", (Icallback)btn_open_cb);
+        IupSetCallback(dlg, "K_cS", (Icallback)btn_saveas_cb);
         IupMainLoop();
 
         IupClose();
