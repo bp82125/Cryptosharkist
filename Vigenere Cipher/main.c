@@ -9,7 +9,6 @@
 #include "icon.h"
 #include <iupkey.h>
 
-// test vigenere
 /******************************-Xử lí chuỗi-*********************************/
 
 char* read_file(const char* filename)
@@ -143,40 +142,19 @@ void descrypt(char source[], char res[]) {
     }
 }
 
-/****************************-Xử lí các nút bấm-*****************************/
+/******************************-Xử lí các thành phần trên các submenu-*********************************/
 
 /*nút mở và đọc file */
 
-int btn_saveas_cb(void)
+int item_open_cb(Ihandle* item_open)
 {
-    Ihandle* text_res = IupGetHandle("text_res");
-    Ihandle* filedlg = IupFileDlg();
-    IupSetAttribute(filedlg, "DIALOGTYPE", "SAVE");
-    IupSetAttributes(filedlg, "FILTER = \"*.txt\"");
-
-    IupPopup(filedlg, IUP_CENTER, IUP_CENTER);
-
-    if (IupGetInt(filedlg, "STATUS") != -1)
-    {
-        char* filename = IupGetAttribute(filedlg, "VALUE");
-        strncat(filename, ".txt", 5);
-        char* str = IupGetAttribute(text_res, "VALUE");
-        int count = IupGetInt(text_res, "COUNT");
-        write_file(filename, str, count);
-    }
-
-    IupDestroy(filedlg);
-    return IUP_DEFAULT;
-}
-
-int btn_open_cb(void)
-{
-    Ihandle* text_source = IupGetHandle("text_source");
+    Ihandle* multitext = IupGetDialogChild(item_open, "SOURCE");
     Ihandle* filedlg = IupFileDlg();
     IupSetAttribute(filedlg, "DIALOGTYPE", "OPEN");
     IupSetAttribute(filedlg, "EXTFILTER", "Text Files|*.txt|All Files|*.*|");
+    IupSetAttributeHandle(filedlg, "PARENTDIALOG", IupGetDialog(item_open));
 
-    IupPopup(filedlg, IUP_CENTER, IUP_CENTER);
+    IupPopup(filedlg, IUP_CENTERPARENT, IUP_CENTERPARENT);
 
     if (IupGetInt(filedlg, "STATUS") != -1)
     {
@@ -184,7 +162,7 @@ int btn_open_cb(void)
         char* str = read_file(filename);
         if (str)
         {
-            IupSetStrAttribute(text_source, "VALUE", str);
+            IupSetStrAttribute(multitext, "VALUE", str);
             free(str);
         }
     }
@@ -193,8 +171,170 @@ int btn_open_cb(void)
     return IUP_DEFAULT;
 }
 
+//nút save file
+
+int item_saveas_cb(Ihandle* item_saveas)
+{
+    Ihandle* multitext = IupGetDialogChild(item_saveas, "RES");
+    Ihandle* filedlg = IupFileDlg();
+    IupSetAttribute(filedlg, "DIALOGTYPE", "SAVE");
+    IupSetAttribute(filedlg, "EXTFILTER", "Text Files|*.txt|All Files|*.*|");
+    IupSetAttribute(filedlg, "EXTDEFAULT", "txt");
+    IupSetAttributeHandle(filedlg, "PARENTDIALOG", IupGetDialog(item_saveas));
+
+    IupPopup(filedlg, IUP_CENTERPARENT, IUP_CENTERPARENT);
+
+    if (IupGetInt(filedlg, "STATUS") != -1)
+    {
+        char* filename = IupGetAttribute(filedlg, "VALUE");
+        char* str = IupGetAttribute(multitext, "VALUE");
+        int count = IupGetInt(multitext, "COUNT");
+        write_file(filename, str, count);
+    }
+
+    IupDestroy(filedlg);
+    return IUP_DEFAULT;
+}
+
+//nút copy
+
+int item_copy_cb(Ihandle* item_copy)
+{
+    Ihandle* text_source = IupGetDialogChild(item_copy, "SOURCE");
+    Ihandle* text_keyword = IupGetDialogChild(item_copy, "KEYWORD");
+    Ihandle* text_res = IupGetDialogChild(item_copy, "RES");
+    Ihandle* clipboard = IupClipboard();
+
+    //nếu không chọn vào 1 trong 3 ô text box thì sẽ không copy được
+
+    if (IupGetFocus() == text_source || IupGetFocus() == text_keyword || IupGetFocus() == text_res) { 
+        //lấy selected text truyền vào ô nhớ tạm
+        IupSetAttribute(clipboard, "TEXT", IupGetAttribute(IupGetFocus(), "SELECTEDTEXT"));
+        //sau khi ấn nút sẽ bỏ chọn text
+        IupSetAttribute(IupGetFocus(), "SELECTION", "NONE");
+    }
+
+    IupDestroy(clipboard);
+    return IUP_DEFAULT;
+}
+
+int item_cut_cb(Ihandle* item_cut)
+{
+    Ihandle* text_source = IupGetDialogChild(item_cut, "SOURCE");
+    Ihandle* text_keyword = IupGetDialogChild(item_cut, "KEYWORD");
+    Ihandle* text_res = IupGetDialogChild(item_cut, "RES");
+    Ihandle* clipboard = IupClipboard();
+
+    //kiểm tra coi người dùng có chọn vào 1 trong 3 ô text box để thực hiện
+
+    if (IupGetFocus() == text_source || IupGetFocus() == text_keyword || IupGetFocus() == text_res) {
+        //lấy selected text truyền vào ô nhớ tạm
+        IupSetAttribute(clipboard, "TEXT", IupGetAttribute(IupGetFocus(), "SELECTEDTEXT"));
+        IupSetAttribute(IupGetFocus(), "SELECTEDTEXT", "");
+    }
+
+    IupDestroy(clipboard);
+    return IUP_DEFAULT;
+}
+
+int item_paste_cb(Ihandle* item_paste)
+{
+    Ihandle* text_source = IupGetDialogChild(item_paste, "SOURCE");
+    Ihandle* text_keyword = IupGetDialogChild(item_paste, "KEYWORD");
+    Ihandle* text_res = IupGetDialogChild(item_paste, "RES");
+    Ihandle* clipboard = IupClipboard();
+
+    //tương tự như trên
+
+    if (IupGetFocus() == text_source || IupGetFocus() == text_keyword || IupGetFocus() == text_res) {
+        //chèn vào vị trí đang có của thanh nhập giá trị của ô nhớ tạm
+        IupSetAttribute(IupGetFocus(), "INSERT", IupGetAttribute(clipboard, "TEXT"));
+    }
+
+    IupDestroy(clipboard);
+    return IUP_IGNORE;
+}
+
+int item_delete_cb(Ihandle* item_delete) {
+    Ihandle* text_source = IupGetDialogChild(item_delete, "SOURCE");
+    Ihandle* text_keyword = IupGetDialogChild(item_delete, "KEYWORD");
+    Ihandle* text_res = IupGetDialogChild(item_delete, "RES");
+
+    if (IupGetFocus() == text_source || IupGetFocus() == text_keyword || IupGetFocus() == text_res) {
+        //cho giá trị rỗng vào selected text
+        IupSetAttribute(IupGetFocus(), "SELECTEDTEXT", "");
+    }
+    return IUP_IGNORE;
+}
+
+int item_select_all_cb(Ihandle* item_select_all) {
+    Ihandle* text_source = IupGetDialogChild(item_select_all, "SOURCE");
+    Ihandle* text_keyword = IupGetDialogChild(item_select_all, "KEYWORD");
+    Ihandle* text_res = IupGetDialogChild(item_select_all, "RES");
+
+    if (IupGetFocus() == text_source || IupGetFocus() == text_keyword || IupGetFocus() == text_res) {
+        //chọn hết tất cả các text trong ô đang focus nếu hợp lệ
+        IupSetAttribute(IupGetFocus(), "SELECTION", "ALL");
+    }
+    return IUP_DEFAULT;
+}
+
+int item_about_cb(Ihandle* item_about) {
+    Ihandle* fill, * label1, * label2, * label3, * vbox, * link, * dlg;
+
+    dlg = (Ihandle*)IupGetAttribute(item_about, "ABOUT_DIALOG");
+
+    fill = IupFill();
+    label1 = IupLabel("A simple a Vigenère Cipher encoder program written in C\nVersion: beta-0.1.2");
+    label2 = IupLabel("Home:");
+    label3 = IupLabel("Credit:\nbp82125\nThienAn923");
+    link = IupLink("https://github.com/bp82125/Vigenere-Cipher", "github.com/bp82125/Vigenere-Cipher");
+    vbox = IupVbox(
+        label1,
+        IupHbox(label2, link, NULL),
+        label3,
+        NULL
+    );
+
+    IupSetAttribute(label1, "ALIGNMENT", "ALEFT");
+    IupSetAttribute(label3, "ALIGNMENT", "ACENTER");
+
+    IupSetAttribute(vbox, "ALIGNMENT", "ACENTER");
+    IupSetAttribute(vbox, "GAP", "5");
+    IupSetAttribute(vbox, "MARGIN", "10x10");
+
+    dlg = IupDialog(vbox);
+    IupSetAttribute(dlg, "TITLE", "About");
+    IupSetAttribute(dlg, "DIALOGFRAME", "Yes");
+    IupSetAttributeHandle(dlg, "PARENTDIALOG", IupGetDialog(item_about));
+
+    IupSetAttribute(item_about, "ABOUT_DIALOG", (char*)dlg);
+    IupPopup(dlg, IUP_CENTER, IUP_CENTER);
+    IupDestroy(dlg);
+
+    return IUP_DEFAULT;
+}
+
+int toggle_cb(Ihandle* ih, int state) {
+    Ihandle* toggle = IupGetHandle("toggle_darkmode");
+    int toggle_state = IupGetInt(toggle, "VALUE");
+    if (toggle_state) {
+        IupSetAttribute(toggle, "IMPRESS", "Brightness");
+    }
+    else {
+        IupSetAttribute(toggle, "IMINACTIVE", "Brightness");
+    }
+    return IUP_DEFAULT;
+}
+
+/******************************-Xử lí các submenu-*********************************/
+
+
+
+/****************************-Xử lí các nút bấm-*****************************/
+
 /* nút exit */
-int btn_exit_cb(Ihandle* self) {
+int item_exit_cb(Ihandle* self) {
     return IUP_CLOSE;
 }
 /*Nút cancel*/
@@ -369,54 +509,6 @@ int btn_encrypt_cb(Ihandle* self) {
         return IUP_DEFAULT;
     }
 
-    int btn_help_cb(Ihandle* item_about) {
-        Ihandle* fill, * label1, * label2, * label3, * vbox, * link, * dlg;
-
-        dlg = (Ihandle*)IupGetAttribute(item_about, "ABOUT_DIALOG");
-
-        fill = IupFill();
-        label1 = IupLabel("A simple a Vigenère Cipher encoder program written in C\nVersion: beta-0.1.2");
-        label2 = IupLabel("Home:");
-        label3 = IupLabel("Credit:\nbp82125\nThienAn923");
-        link = IupLink("https://github.com/bp82125/Vigenere-Cipher", "github.com/bp82125/Vigenere-Cipher");
-        vbox = IupVbox(
-            label1,
-            IupHbox(label2, link, NULL),
-            label3,
-            NULL
-        );
-
-        IupSetAttribute(label1, "ALIGNMENT", "ALEFT");
-        IupSetAttribute(label3, "ALIGNMENT", "ACENTER");
-
-        IupSetAttribute(vbox, "ALIGNMENT", "ACENTER");
-        IupSetAttribute(vbox, "GAP", "5");
-        IupSetAttribute(vbox, "MARGIN", "10x10");
-
-        dlg = IupDialog(vbox);
-        IupSetAttribute(dlg, "TITLE", "About");
-        IupSetAttribute(dlg, "DIALOGFRAME", "Yes");
-        IupSetAttributeHandle(dlg, "PARENTDIALOG", IupGetDialog(item_about));
-
-        IupSetAttribute(item_about, "ABOUT_DIALOG", (char*)dlg);
-        IupPopup(dlg, IUP_CENTER, IUP_CENTER);
-        IupDestroy(dlg);
-
-        return IUP_DEFAULT;
-    }
-
-    int toggle_cb(Ihandle* ih, int state) {
-        Ihandle* toggle = IupGetHandle("toggle_darkmode");
-        int toggle_state = IupGetInt(toggle, "VALUE");
-        if (toggle_state) {
-            IupSetAttribute(toggle, "IMPRESS", "Brightness");
-        }
-        else {
-            IupSetAttribute(toggle, "IMINACTIVE", "Brightness");
-        }
-        return IUP_DEFAULT;
-    }
-
     /*********************-Hàm chính trong chương trình-***********************/
 
     int main(int argc, char** argv)
@@ -446,6 +538,10 @@ int btn_encrypt_cb(Ihandle* self) {
         text_keyword = IupText(NULL);
         text_source = IupText(NULL);
         text_res = IupText(NULL);
+
+        IupSetAttribute(text_source, "NAME", "SOURCE");
+        IupSetAttribute(text_keyword, "NAME", "KEYWORD");
+        IupSetAttribute(text_res, "NAME", "RES");
 
         //khai báo các nút
 
@@ -494,7 +590,7 @@ int btn_encrypt_cb(Ihandle* self) {
         item_cut = IupItem("Cut...\tCtrl + X",NULL);
         item_copy = IupItem("Copy...\tCtrl + C",NULL);
         item_paste = IupItem("Paste...\tCtrl + V",NULL);
-        item_delete = IupItem("Delete...\tDel",NULL);
+        item_delete = IupItem("Delete\tDel",NULL);
         item_select_all = IupItem("Select All\tCtrl + A", NULL);
 
         IupSetAttribute(item_cut, "TITLEIMAGE", "Cut");
@@ -639,21 +735,32 @@ int btn_encrypt_cb(Ihandle* self) {
 
         //gán event cho các nút trong menu
 
-        IupSetCallback(item_open, "ACTION", (Icallback)btn_open_cb);
-        IupSetCallback(item_exit, "ACTION", (Icallback)btn_exit_cb);
-        IupSetCallback(item_about, "ACTION", (Icallback)btn_help_cb);
-        IupSetCallback(item_saveas, "ACTION", (Icallback)btn_saveas_cb);
+        IupSetCallback(item_open, "ACTION", (Icallback)item_open_cb);
+        IupSetCallback(item_exit, "ACTION", (Icallback)item_exit_cb);
+        IupSetCallback(item_about, "ACTION", (Icallback)item_about_cb);
+        IupSetCallback(item_saveas, "ACTION", (Icallback)item_saveas_cb);
+
+        IupSetCallback(item_copy, "ACTION", (Icallback)item_copy_cb);
+        IupSetCallback(item_cut, "ACTION", (Icallback)item_cut_cb);
+        IupSetCallback(item_paste, "ACTION", (Icallback)item_paste_cb);
+        IupSetCallback(item_delete, "ACTION", (Icallback)item_delete_cb);
+        IupSetCallback(item_select_all, "ACTION", (Icallback)item_select_all_cb);
 
         //gán event cho các nút trong toolbar
 
-        IupSetCallback(btn_open, "ACTION", (Icallback)btn_open_cb);
-        IupSetCallback(btn_save, "ACTION", (Icallback)btn_saveas_cb);
+        IupSetCallback(btn_open, "ACTION", (Icallback)item_open_cb);
+        IupSetCallback(btn_save, "ACTION", (Icallback)item_saveas_cb);
         IupSetCallback(toggle_darkmode, "ACTION", (Icallback)toggle_cb);
 
         //định nghĩa các shortcut
 
-        IupSetCallback(dlg, "K_cO", (Icallback)btn_open_cb);
-        IupSetCallback(dlg, "K_cS", (Icallback)btn_saveas_cb);
+        IupSetCallback(dlg, "K_cO", (Icallback)item_open_cb);
+        IupSetCallback(dlg, "K_cS", (Icallback)item_saveas_cb);
+        IupSetCallback(dlg, "K_cC", (Icallback)item_copy_cb);
+        IupSetCallback(dlg, "K_cX", (Icallback)item_cut_cb);
+        IupSetCallback(dlg, "K_cV", (Icallback)item_paste_cb);
+        IupSetCallback(dlg, "K_DEL", (Icallback)item_delete_cb);
+        IupSetCallback(dlg, "K_cA", (Icallback)item_select_all_cb);
         IupMainLoop();
 
         IupClose();
