@@ -613,12 +613,11 @@ int btn_encrypt_cb(Ihandle* self) {
         //khai báo các phần tử sub menu file
 
         item_open = IupItem("Open\tCtrl + O", NULL);
-        item_saveas = IupItem("Save as\t Ctrl + S", NULL);
-        item_exit = IupItem("Exit", NULL);
+        item_saveas = IupItem("Save as\tCtrl + S", NULL);
+        item_exit = IupItem("Exit\tAlt + F4", NULL);
 
         IupSetAttribute(item_open, "TITLEIMAGE", "OpenFolder");
         IupSetAttribute(item_saveas, "TITLEIMAGE", "SaveAs");
-        IupSetAttribute(item_exit, "TITLEIMAGE", "Exit");
 
         //khai báo các phần tử sub menu edit
 
@@ -804,6 +803,8 @@ int btn_encrypt_cb(Ihandle* self) {
         IupSetCallback(dlg, "K_cV", (Icallback)item_paste_cb);
         IupSetCallback(dlg, "K_DEL", (Icallback)item_delete_cb);
         IupSetCallback(dlg, "K_cA", (Icallback)item_select_all_cb);
+        IupSetCallback(dlg, "K_mF4", (Icallback)item_exit_cb);
+        
         IupMainLoop();
 
         IupClose();
