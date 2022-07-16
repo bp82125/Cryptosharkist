@@ -329,7 +329,42 @@ int toggle_cb(Ihandle* ih, int state) {
 
 /******************************-Xử lí các submenu-*********************************/
 
+int edit_submenu_cb(Ihandle* ih) {
+    Ihandle* clipboard = IupClipboard();
 
+    Ihandle* item_cut = IupGetDialogChild(ih, "CUT");
+    Ihandle *item_copy = IupGetDialogChild(ih, "COPY");
+    Ihandle *item_paste = IupGetDialogChild(ih, "PASTE");
+    Ihandle *item_delete = IupGetDialogChild(ih, "DELETE");
+    Ihandle *item_select_all = IupGetDialogChild(ih, "SELECT");
+
+    Ihandle* text_source = IupGetDialogChild(ih, "SOURCE");
+    Ihandle* text_keyword = IupGetDialogChild(ih, "KEYWORD");
+    Ihandle* text_res = IupGetDialogChild(ih, "RES");
+
+    if (!IupGetInt(clipboard, "TEXTAVAILABLE")) {
+        IupSetAttribute(item_paste, "ACTIVE", "NO");
+    }
+    else {
+        IupSetAttribute(item_paste, "ACTIVE", "YES");
+    }
+
+    if (IupGetAttribute(text_source, "SELECTEDTEXT")|| IupGetAttribute(text_keyword, "SELECTEDTEXT")|| IupGetAttribute(text_res, "SELECTEDTEXT")) {
+        IupSetAttribute(item_cut, "ACTIVE", "YES");
+        IupSetAttribute(item_delete, "ACTIVE", "YES");
+        IupSetAttribute(item_copy, "ACTIVE", "YES");
+    }
+    else {
+        IupSetAttribute(item_cut, "ACTIVE", "NO");
+        IupSetAttribute(item_delete, "ACTIVE", "NO");
+        IupSetAttribute(item_copy, "ACTIVE", "NO");
+    }
+
+    
+
+    IupDestroy(clipboard);
+    return IUP_DEFAULT;
+}
 
 /****************************-Xử lí các nút bấm-*****************************/
 
@@ -577,8 +612,8 @@ int btn_encrypt_cb(Ihandle* self) {
 
         //khai báo các phần tử sub menu file
 
-        item_open = IupItem("Open...\tCtrl + O", NULL);
-        item_saveas = IupItem("Save as...\t Ctrl + S", NULL);
+        item_open = IupItem("Open\tCtrl + O", NULL);
+        item_saveas = IupItem("Save as\t Ctrl + S", NULL);
         item_exit = IupItem("Exit", NULL);
 
         IupSetAttribute(item_open, "TITLEIMAGE", "OpenFolder");
@@ -587,11 +622,17 @@ int btn_encrypt_cb(Ihandle* self) {
 
         //khai báo các phần tử sub menu edit
 
-        item_cut = IupItem("Cut...\tCtrl + X",NULL);
-        item_copy = IupItem("Copy...\tCtrl + C",NULL);
-        item_paste = IupItem("Paste...\tCtrl + V",NULL);
+        item_cut = IupItem("Cut\tCtrl + X",NULL);
+        item_copy = IupItem("Copy\tCtrl + C",NULL);
+        item_paste = IupItem("Paste\tCtrl + V",NULL);
         item_delete = IupItem("Delete\tDel",NULL);
         item_select_all = IupItem("Select All\tCtrl + A", NULL);
+
+        IupSetAttribute(item_cut, "NAME", "CUT");
+        IupSetAttribute(item_copy, "NAME", "COPY");
+        IupSetAttribute(item_paste, "NAME", "PASTE");
+        IupSetAttribute(item_delete, "NAME", "DELETE");
+        IupSetAttribute(item_select_all, "NAME", "SELECT");
 
         IupSetAttribute(item_cut, "TITLEIMAGE", "Cut");
         IupSetAttribute(item_copy, "TITLEIMAGE", "Copy");
@@ -634,6 +675,8 @@ int btn_encrypt_cb(Ihandle* self) {
         sub_file_menu = IupSubmenu("File", file_menu);
         sub_about_menu = IupSubmenu("Help", help_menu);
         sub_edit_menu = IupSubmenu("Edit", edit_menu);
+
+        IupSetCallback(edit_menu, "OPEN_CB", edit_submenu_cb);
 
         //khai báo menu chính
 
