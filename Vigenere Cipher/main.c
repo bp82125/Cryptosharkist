@@ -612,7 +612,7 @@ int btn_encrypt_vigenere_cb(Ihandle* self) {
     }
 
     int btn_encrypt_3(Ihandle* self) {
-        IupMessage("Test", "3");
+        IupMessage("Test", "4");
         return IUP_DEFAULT;
     }
 
