@@ -107,7 +107,7 @@ void replace_char(char source[], char res[], char keyword[]) {
 }
 
 /* hàm mã hoá */
-void encrypt(char source[], char res[]) {
+void encrypt_vigenere(char source[], char res[]) {
     int n = strlen(source);
     for (int i = 0; i < n; i++) {
         if (source[i] == ' ') // nếu là khoảng trắng thì skip
@@ -122,7 +122,7 @@ void encrypt(char source[], char res[]) {
 }
 
 /* hàm giải mã */
-void descrypt(char source[], char res[]) {
+void descrypt_vigenere(char source[], char res[]) {
     int n = strlen(source);
     for (int i = 0; i < n; i++) {
         if (source[i] == ' ') {
@@ -142,6 +142,9 @@ void descrypt(char source[], char res[]) {
     }
 }
 
+void encrypt_ceasar(char res[]) {
+
+}
 /******************************-Xử lí các thành phần trên các submenu-*********************************/
 
 /*nút mở và đọc file */
@@ -316,14 +319,18 @@ int item_about_cb(Ihandle* item_about) {
 }
 
 int toggle_cb(Ihandle* ih, int state) {
+    Ihandle * text_keyword = IupGetDialogChild(ih, "FRAMEKEYWORD");
     Ihandle* toggle = IupGetHandle("toggle_darkmode");
     int toggle_state = IupGetInt(toggle, "VALUE");
     if (toggle_state) {
-        IupSetAttribute(toggle, "IMPRESS", "Brightness");
+        IupSetAttribute(text_keyword, "VISIBLE", "NO");
+        IupSetAttribute(text_keyword, "FLOATING", "YES");
     }
     else {
-        IupSetAttribute(toggle, "IMINACTIVE", "Brightness");
+        IupSetAttribute(text_keyword, "VISIBLE", "YES");
+        IupSetAttribute(text_keyword, "FLOATING", "NO");
     }
+    IupRefresh(ih);
     return IUP_DEFAULT;
 }
 
@@ -409,7 +416,7 @@ int btn_clear_cb(Ihandle* self) {
 }
 
 /* nút encrypt */
-int btn_encrypt_cb(Ihandle* self) {
+int btn_encrypt_vigenere_cb(Ihandle* self) {
     Ihandle* text_res;
     Ihandle* text_source;
     Ihandle* text_keyword;
@@ -489,7 +496,7 @@ int btn_encrypt_cb(Ihandle* self) {
 
         sprintf(res, "%s", source);
         replace_char(source, res, keyword);
-        encrypt(source, res);
+        encrypt_vigenere(source, res);
 
         IupSetAttribute(text_res, "VALUE", res);
 
@@ -501,14 +508,14 @@ int btn_encrypt_cb(Ihandle* self) {
  
 
     /* nút descrypt */
-    int btn_descrypt_cb(Ihandle * self) {
+    int btn_descrypt_vigenere_cb(Ihandle * self) {
         Ihandle* text_res;
         Ihandle* text_source;
         Ihandle* text_keyword;
 
-        text_keyword = IupGetHandle("text_keyword");
-        text_source = IupGetHandle("text_source");
-        text_res = IupGetHandle("text_res");
+        text_keyword = IupGetDialogChild(self, "KEYWORD");
+        text_source = IupGetDialogChild(self, "SOURCE");
+        text_res = IupGetDialogChild(self, "RES");
 
         int source_len = strlen(IupGetAttribute(text_source, "VALUE"));
         int keyword_len = strlen(IupGetAttribute(text_keyword, "VALUE"));
@@ -534,13 +541,88 @@ int btn_encrypt_cb(Ihandle* self) {
 
         sprintf(res, "%s", source);
         replace_char(source, res, keyword);
-        descrypt(source, res);
+        descrypt_vigenere(source, res);
 
         IupSetAttribute(text_res, "VALUE", res);
 
         free(source);
         free(keyword);
         free(res);
+        return IUP_DEFAULT;
+    }
+
+    int btn_encrypt_1(Ihandle* self) {
+        IupMessage("Test", "1");
+        return IUP_DEFAULT;
+    }
+
+    int btn_encrypt_ceasar_cb(Ihandle* self) {
+        IupMessage("Test", "2");
+        return IUP_DEFAULT;
+    }
+
+    int btn_encrypt_3(Ihandle* self) {
+        IupMessage("Test", "3");
+        return IUP_DEFAULT;
+    }
+
+    int btn_encrypt_4(Ihandle* self) {
+        IupMessage("Test", "4");
+        return IUP_DEFAULT;
+    }
+
+    int btn_encrypt_5(Ihandle* self) {
+        IupMessage("Test", "5");
+        return IUP_DEFAULT;
+    }
+
+    int btn_encrypt_6(Ihandle* self) {
+        IupMessage("Test", "6");
+        return IUP_DEFAULT;
+    }
+
+    int list_cb(Ihandle* self, char* t, int i, int v)
+    {
+        Ihandle* btn_encrypt = IupGetDialogChild(self, "ENCRYPT");
+        Ihandle* frame_keyword = IupGetDialogChild(self, "FRAMEKEYWORD");
+        switch (i) {
+        case 1:
+            IupSetCallback(btn_encrypt, "ACTION", (Icallback)btn_encrypt_1);
+            IupSetAttribute(frame_keyword, "VISIBLE", "YES");
+            IupSetAttribute(frame_keyword, "FLOATING", "NO");
+            IupRefresh(self);
+            break;
+        case 2:
+            IupSetCallback(btn_encrypt, "ACTION", (Icallback)btn_encrypt_ceasar_cb);
+            IupSetAttribute(frame_keyword, "VISIBLE", "NO");
+            IupSetAttribute(frame_keyword, "FLOATING", "YES");
+            IupRefresh(self);
+            break;
+        case 3:
+            IupSetCallback(btn_encrypt, "ACTION", (Icallback)btn_encrypt_3);
+            IupSetAttribute(frame_keyword, "VISIBLE", "NO");
+            IupSetAttribute(frame_keyword, "FLOATING", "YES");
+            IupRefresh(self);
+            break;
+        case 4:
+            IupSetCallback(btn_encrypt, "ACTION", (Icallback)btn_encrypt_4);
+            IupSetAttribute(frame_keyword, "VISIBLE", "NO");
+            IupSetAttribute(frame_keyword, "FLOATING", "YES");
+            IupRefresh(self);
+            break;
+        case 5:
+            IupSetCallback(btn_encrypt, "ACTION", (Icallback)btn_encrypt_5);
+            IupSetAttribute(frame_keyword, "VISIBLE", "NO");
+            IupSetAttribute(frame_keyword, "FLOATING", "YES");
+            IupRefresh(self);
+            break;
+        case 6:
+            IupSetCallback(btn_encrypt, "ACTION", (Icallback)btn_encrypt_6);
+            IupSetAttribute(frame_keyword, "VISIBLE", "NO");
+            IupSetAttribute(frame_keyword, "FLOATING", "YES");
+            IupRefresh(self);
+            break;
+        }
         return IUP_DEFAULT;
     }
 
@@ -560,6 +642,7 @@ int btn_encrypt_cb(Ihandle* self) {
         Ihandle* sub_file_menu, * sub_about_menu, * sub_edit_menu;
         Ihandle* toggle;
         Ihandle* toolbar_hb, * btn_open, * btn_save, * toggle_darkmode, * fill;
+        Ihandle* list;
 
         IupOpen(&argc, &argv);
 
@@ -583,6 +666,10 @@ int btn_encrypt_cb(Ihandle* self) {
         btn_encrypt = IupButton("Encrypt", NULL);
         btn_descrypt = IupButton("Descrypt", NULL);
         btn_clear = IupButton("Clear", NULL);
+
+        IupSetAttribute(btn_encrypt, "NAME", "ENCRYPT");
+        IupSetAttribute(btn_descrypt, "NAME", "DESCRYPT");
+        IupSetAttribute(btn_clear, "NAME", "CLEAR");
 
         //khai báo và điều chỉnh các nút trên toolbar
         fill = IupFill();
@@ -639,6 +726,14 @@ int btn_encrypt_cb(Ihandle* self) {
         IupSetAttribute(item_delete, "TITLEIMAGE", "Cancel");
         IupSetAttribute(item_select_all, "TITLEIMAGE", "Select");
 
+        //khai báo list đổi mã
+
+        list = IupList(NULL);
+        IupSetAttributes(list, "1=\"Vigenere Cipher\", 2=\"Ceasar Cipher\", 3=\"A1Z26 Cipher\", 4=\"Binary\", 5=\"Decimal\",6=\"Hex\","
+            "DROPDOWN=YES , VALUE=\"+--+--\", SIZE=EIGHTHxEIGHTH");
+
+        IupSetCallback(list, "ACTION", (Icallback)list_cb);
+
         //khai báo các phần tử sub menu help
 
         item_about = IupItem("About", NULL);
@@ -689,6 +784,7 @@ int btn_encrypt_cb(Ihandle* self) {
             btn_save,
             IupSetAttributes(IupLabel(NULL), "SEPARATOR=VERTICAL"),
             IupFill(),
+            list,
             toggle_darkmode,
             NULL
         );
@@ -717,6 +813,8 @@ int btn_encrypt_cb(Ihandle* self) {
         IupSetAttribute(frame_encrypt, "TITLE", "Enter plain text/cipher text here:");
         IupSetAttribute(frame_keyword, "TITLE", "Enter keyword here:");
         IupSetAttribute(frame_res, "TITLE", "Result:");
+
+        IupSetAttribute(frame_keyword, "NAME", "FRAMEKEYWORD");
 
         //điều chỉnh hộp phần tử
 
@@ -771,8 +869,8 @@ int btn_encrypt_cb(Ihandle* self) {
 
         //gán các event cho các nút
 
-        IupSetCallback(btn_encrypt, "ACTION", (Icallback)btn_encrypt_cb);
-        IupSetCallback(btn_descrypt, "ACTION", (Icallback)btn_descrypt_cb);
+        IupSetCallback(btn_encrypt, "ACTION", (Icallback)btn_encrypt_vigenere_cb);
+        IupSetCallback(btn_descrypt, "ACTION", (Icallback)btn_descrypt_vigenere_cb);
         IupSetCallback(btn_clear, "ACTION", (Icallback)btn_clear_cb);
 
         //gán event cho các nút trong menu
