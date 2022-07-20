@@ -158,10 +158,10 @@ void encrypt_A1Z26(int res[]) {
     int n = strlen(res);
     for (int i = 0; i < n; ++i) {
         if (res[i] >= 'a' && res[i] <= 'z') {
-            res[i] = (res[i] - 'a') % 26
+            res[i] = (res[i] - 'a') % 26;
         }
         else if (res[i] >= 'A' && res[i] <= 'Z') {
-            res[i] = (res[i] - 'A') % 26
+            res[i] = (res[i] - 'A') % 26;
         }
     }
 }
