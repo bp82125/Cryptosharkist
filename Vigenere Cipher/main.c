@@ -142,8 +142,28 @@ void descrypt_vigenere(char source[], char res[]) {
     }
 }
 
-void encrypt_ceasar(char res[]) {
+void descrypt_ceasar(char res[]) {
+    int n = strlen(res);
+    for (int i = 0; i < n; ++i) {
+        if (res[i] >= 'a' && res[i] <= 'z') {
+            res[i] = (res[i]  + 3 - 'a') % 26 + 'a';
+        }
+        else if (res[i] >= 'A' && res[i] <= 'Z') {
+            res[i] = (res[i] - 'A' + 3) % 26 + 'A';
+        }
+    }
+}
 
+void encrypt_A1Z26(int res[]) {
+    int n = strlen(res);
+    for (int i = 0; i < n; ++i) {
+        if (res[i] >= 'a' && res[i] <= 'z') {
+            res[i] = (res[i] - 'a') % 26
+        }
+        else if (res[i] >= 'A' && res[i] <= 'Z') {
+            res[i] = (res[i] - 'A') % 26
+        }
+    }
 }
 /******************************-Xử lí các thành phần trên các submenu-*********************************/
 
@@ -561,6 +581,36 @@ int btn_encrypt_vigenere_cb(Ihandle* self) {
         return IUP_DEFAULT;
     }
 
+    int btn_descrypt_ceasar_cb(Ihandle* self) {
+        Ihandle* text_res;
+        Ihandle* text_source;
+
+        text_source = IupGetDialogChild(self, "SOURCE");
+        text_res = IupGetDialogChild(self, "RES");
+
+        int source_len = strlen(IupGetAttribute(text_source, "VALUE"));
+
+        if (source_len == 0) {
+            IupMessage("Baka do ngoc", "Chua nhap gi kia :v");
+            return IUP_DEFAULT;
+        }
+
+        char* source = (char*)malloc(sizeof(char) * (source_len + 1));
+        char* res = (char*)malloc(sizeof(char) * (source_len + 1));
+
+        sprintf(source, "%s", IupGetAttribute(text_source, "VALUE"));
+        sprintf(res, "%s", IupGetAttribute(text_res, "VALUE"));
+
+        sprintf(res, "%s", source);
+        descrypt_ceasar(res);
+
+        IupSetAttribute(text_res, "VALUE", res);
+
+        free(source);
+        free(res);
+        return IUP_DEFAULT;
+    }
+
     int btn_encrypt_3(Ihandle* self) {
         IupMessage("Test", "3");
         return IUP_DEFAULT;
@@ -584,6 +634,7 @@ int btn_encrypt_vigenere_cb(Ihandle* self) {
     int list_cb(Ihandle* self, char* t, int i, int v)
     {
         Ihandle* btn_encrypt = IupGetDialogChild(self, "ENCRYPT");
+        Ihandle* btn_descrypt = IupGetDialogChild(self, "DESCRYPT");
         Ihandle* frame_keyword = IupGetDialogChild(self, "FRAMEKEYWORD");
         switch (i) {
         case 1:
@@ -594,6 +645,8 @@ int btn_encrypt_vigenere_cb(Ihandle* self) {
             break;
         case 2:
             IupSetCallback(btn_encrypt, "ACTION", (Icallback)btn_encrypt_ceasar_cb);
+            IupSetCallback(btn_descrypt, "ACTION", (Icallback)btn_descrypt_ceasar_cb);
+
             IupSetAttribute(frame_keyword, "VISIBLE", "NO");
             IupSetAttribute(frame_keyword, "FLOATING", "YES");
             IupRefresh(self);
