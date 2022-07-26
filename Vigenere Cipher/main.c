@@ -569,8 +569,6 @@ int edit_submenu_cb(Ihandle* ih) {
         IupSetAttribute(item_copy, "ACTIVE", "NO");
     }
 
-    
-
     IupDestroy(clipboard);
     return IUP_DEFAULT;
 }
@@ -939,7 +937,7 @@ int btn_encrypt_vigenere_cb(Ihandle* self) {
         Ihandle* file_menu, *edit_menu, * help_menu, * main_menu;
         Ihandle* sub_file_menu, * sub_about_menu, * sub_edit_menu;
         Ihandle* toggle;
-        Ihandle* toolbar_hb, * btn_open, * btn_save, * toggle_darkmode, * fill;
+        Ihandle* toolbar_hb, * btn_open, * btn_save, * toggle_darkmode, * fill, * btn_cut, * btn_copy, *btn_paste;
         Ihandle* list;
 
         IupOpen(&argc, &argv);
@@ -975,15 +973,35 @@ int btn_encrypt_vigenere_cb(Ihandle* self) {
 
         btn_open = IupButton(NULL, NULL);
         btn_save = IupButton(NULL, NULL);
+        btn_cut = IupButton(NULL, NULL);
+        btn_copy = IupButton(NULL, NULL);
+        btn_paste = IupButton(NULL, NULL);
         toggle_darkmode = IupToggle(NULL, NULL);
 
         IupSetAttribute(btn_open, "IMAGE", "OpenFolder");
+        IupSetAttribute(btn_open, "RASTERSIZE", "30x30");
         IupSetAttribute(btn_open, "FLAT", "Yes");
         IupSetAttribute(btn_open, "CANFOCUS", "No");
 
         IupSetAttribute(btn_save, "IMAGE", "SaveAs");
         IupSetAttribute(btn_save, "FLAT", "Yes");
+        IupSetAttribute(btn_save, "RASTERSIZE", "30x30");
         IupSetAttribute(btn_save, "CANFOCUS", "No");
+        
+        IupSetAttribute(btn_cut, "IMAGE", "Cut");
+        IupSetAttribute(btn_cut, "FLAT", "Yes");
+        IupSetAttribute(btn_cut, "RASTERSIZE", "30x30");
+        IupSetAttribute(btn_cut, "CANFOCUS", "No");
+
+        IupSetAttribute(btn_copy, "IMAGE", "Copy");
+        IupSetAttribute(btn_copy, "FLAT", "Yes");
+        IupSetAttribute(btn_copy, "RASTERSIZE", "30x30");
+        IupSetAttribute(btn_copy, "CANFOCUS", "No");
+
+        IupSetAttribute(btn_paste, "IMAGE", "Paste");
+        IupSetAttribute(btn_paste, "FLAT", "Yes");
+        IupSetAttribute(btn_paste, "RASTERSIZE", "30x30");
+        IupSetAttribute(btn_paste, "CANFOCUS", "No");
 
         IupSetAttribute(toggle_darkmode, "IMAGE", "DarkTheme");
         IupSetAttribute(toggle_darkmode, "FLAT", "Yes");
@@ -1081,6 +1099,9 @@ int btn_encrypt_vigenere_cb(Ihandle* self) {
             btn_open,
             btn_save,
             IupSetAttributes(IupLabel(NULL), "SEPARATOR=VERTICAL"),
+            btn_cut,
+            btn_copy,
+            btn_paste,
             IupFill(),
             list,
             toggle_darkmode,
@@ -1118,7 +1139,7 @@ int btn_encrypt_vigenere_cb(Ihandle* self) {
 
         IupSetAttribute(toolbar_hb, "ALIGNMENT", "ALEFT");
         IupSetAttribute(toolbar_hb, "MARGIN", "5x5");
-        IupSetAttribute(toolbar_hb, "GAP", "2");
+        IupSetAttribute(toolbar_hb, "GAP", "1");
 
         IupSetAttribute(element_box, "ALIGNMENT", "ACENTER");
         IupSetAttribute(element_box, "GAP", "10");
@@ -1188,6 +1209,9 @@ int btn_encrypt_vigenere_cb(Ihandle* self) {
 
         IupSetCallback(btn_open, "ACTION", (Icallback)item_open_cb);
         IupSetCallback(btn_save, "ACTION", (Icallback)item_saveas_cb);
+        IupSetCallback(btn_copy, "ACTION", (Icallback)item_copy_cb);
+        IupSetCallback(btn_cut, "ACTION", (Icallback)item_cut_cb);
+        IupSetCallback(btn_paste, "ACTION", (Icallback)item_paste_cb);
         IupSetCallback(toggle_darkmode, "ACTION", (Icallback)toggle_cb);
 
         //định nghĩa các shortcut
