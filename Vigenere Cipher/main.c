@@ -154,16 +154,198 @@ void descrypt_ceasar(char res[]) {
     }
 }
 
-void encrypt_A1Z26(int res[]) {
-    int n = strlen(res);
+int is_alphabet(char c) {
+    if ('A' <= c && c <= 'Z') return 1;
+    if ('a' <= c && c <= 'z') return 1;
+    return 0;
+}
+
+int encrypt_state_check(char* str, int len, int index) {
+    char current = str[index];
+
+    if (index == len - 1 && is_alphabet(current)) {
+        return 2;
+    }
+    if (index == len - 1 && !is_alphabet(current)) {
+        return 3;
+    }
+
+    if (!is_alphabet(current)) {
+        return 3;
+    }
+
+    char next = str[index + 1];
+
+    if (is_alphabet(current) && is_alphabet(next)) {
+        return 1;
+    }
+    if (is_alphabet(current) && !is_alphabet(next)) {
+        return 2;
+    }
+    return 0;
+}
+
+void encrypt_A1Z26(char* str, char* res) {
+    int n = strlen(str);
+    int state = 0;
+    int offset = 0;
     for (int i = 0; i < n; ++i) {
-        if (res[i] >= 'a' && res[i] <= 'z') {
-            res[i] = (res[i] - 'a') % 26;
-        }
-        else if (res[i] >= 'A' && res[i] <= 'Z') {
-            res[i] = (res[i] - 'A') % 26;
+        state = encrypt_state_check(str, n, i);
+        switch (state) {
+        case 1:
+            offset += sprintf(res + offset, "%d-", tolower(str[i]) - 'a' + 1);
+            break;
+        case 2:
+            offset += sprintf(res + offset, "%d", tolower(str[i]) - 'a' + 1);
+            break;
+        case 3:
+            offset += sprintf(res + offset, "%c", str[i]);
+            break;
         }
     }
+}
+
+int encrypt_length(char* str, int len) {
+    int count = 0;
+    int state = 0;
+    for (int i = 0; i < len; ++i) {
+        state = encrypt_state_check(str, len, i);
+        switch (state) {
+        case 1:
+            if (str[i] >= 'j' && str[i] <= 'z') {
+                count += 3;
+            }
+            else {
+                count += 2;
+            }
+            break;
+        case 2:
+            if (str[i] >= 'j' && str[i] <= 'z') {
+                count += 2;
+            }
+            else {
+                count += 1;
+            }
+            break;
+        case 3:
+            count++;
+            break;
+        }
+    }
+    return count;
+}
+
+int is_number(char c) {
+    if ('0' <= c && c <= '9') return 1;
+    return 0;
+}
+
+int descrypt_state_check(char source[], int len, int index) {
+    int current = source[index];
+
+    if (index == 0 && is_number(current)) {
+        return 1;
+    }
+    if (index == 0 && !is_number(current)) {
+        return 4;
+    }
+
+    int previous = source[index - 1];
+
+    if (index == len - 1 && is_number(current)) {
+        return 5;
+    }
+    if (index == len - 1 && !is_number(current) && is_number(previous)) {
+        return 6;
+    }
+    if (index == len - 1 && !is_number(current) && !is_number(previous)) {
+        return 4;
+    }
+
+    if (is_number(current) && !is_number(previous)) {
+        return 1;
+    }
+    if (is_number(current) && is_number(previous)) {
+        return 2;
+    }
+    if (!is_number(current) && is_number(previous)) {
+        return 3;
+    }
+    if (!is_number(current) && !is_number(previous)) {
+        return 4;
+    }
+    return 0;
+}
+
+void descrypt_A1Z26(char* source, char* res) {
+    int n = strlen(source);
+    int state;
+    int number;
+    int offset = 0;
+    for (int i = 0; i < n; ++i) {
+        state = descrypt_state_check(source, n, i);
+        switch (state) {
+        case 1:
+            number = source[i] - '0';
+            break;
+        case 2:
+            number = number * 10 + source[i] - '0';
+            break;
+        case 3:
+            offset += sprintf(res + offset, "%c", number + 'a' - 1);
+            number = 0;
+            if (source[i] == '-' && !is_number(source[i + 1])) {
+                offset += sprintf(res + offset, "%s", "-");
+            }
+            if (source[i] != '-')
+                offset += sprintf(res + offset, "%c", source[i]);
+            break;
+        case 4:
+            offset += sprintf(res + offset, "%c", source[i]);
+            break;
+        case 5:
+            number = number * 10 + source[i] - '0' + 'a' - 1;
+            offset += sprintf(res + offset, "%c", number);
+            break;
+        case 6:
+            offset += sprintf(res + offset, "%c", number + 'a' - 1);
+            offset += sprintf(res + offset, "%c", source[i]);
+            break;
+        }
+    }
+}
+
+int descrypt_length(char* source, int len) {
+    int state = 0;
+    int count = 0;
+    for (int i = 0; i < len; ++i) {
+        state = descrypt_state_check(source, len, i);
+        switch (state) {
+        case 1:
+            count++;
+            break;
+        case 2:
+            break;
+        case 3:
+            if (source[i] != '-')
+                count++;
+            else if (source[i] == '-' && !is_number(source[i + 1]))
+                count++;
+            break;
+        case 4:
+            count++;
+            break;
+        case 5:
+            if (!is_number(source[i - 1])) {
+                count++;
+            }
+            break;
+        case 6:
+            count++;
+            break;
+        }
+    }
+    return count;
 }
 /******************************-Xử lí các thành phần trên các submenu-*********************************/
 
@@ -441,6 +623,7 @@ int btn_encrypt_vigenere_cb(Ihandle* self) {
     Ihandle* text_source;
     Ihandle* text_keyword;
     Ihandle* toggle;
+    int cypher = 1;
 
     text_keyword = IupGetHandle("text_keyword");
     text_source = IupGetHandle("text_source");
@@ -450,66 +633,70 @@ int btn_encrypt_vigenere_cb(Ihandle* self) {
     int source_len = strlen(IupGetAttribute(text_source, "VALUE"));
     int keyword_len = strlen(IupGetAttribute(text_keyword, "VALUE"));
     int toggle_state = IupGetInt(toggle, "VALUE");
-    if (source_len == 0) {
-        IupMessage("Baka do ngoc", "Chua nhap gi kia :v");
-        return IUP_DEFAULT;
-    }
 
     char* source = (char*)malloc(sizeof(char) * (source_len + 1));
     char* keyword = (char*)malloc(sizeof(char) * (keyword_len + 1));
     char* res = (char*)malloc(sizeof(char) * (source_len + 1));
 
-    sprintf(keyword, "%s", IupGetAttribute(text_keyword, "VALUE"));
-
-    if (!keyword_check(keyword)) {
-
-        IupMessage("Error!", "Keyword is not suitable");
-
-        return IUP_DEFAULT;
-
-    }
-
-    /*Tạo dialog nếu keyword bỏ trống*/
-    if (toggle_state) {
-        free(keyword);
-        keyword_len = (rand() % (20 - 10 + 1)) + 10;
-        keyword = (char*)malloc(sizeof(char) * (keyword_len + 1));
-        random_keyword(keyword, keyword_len);
-        IupSetAttribute(text_keyword, "VALUE", keyword);
-    }
-    else if (!toggle_state && keyword_len ==0) {
-       
-        Ihandle* button, * button_2, * label, * dlg, * vbox;
-
-        label = IupLabel("You haven't entered any keyword. Do you want to create a random one ?");
-        IupSetAttribute(label, "PADDING", "10x20");
-        button = IupButton("OK", NULL);
-        button_2 = IupButton("Cancel", NULL);
-        IupSetAttribute(button, "PADDING", "30x2");
-        IupSetAttribute(button_2, "PADDING", "30x2");
-
-        vbox = IupVbox(
-            label,
-            IupHbox(button, button_2, NULL),
-            NULL);
-        IupSetAttribute(vbox, "ALIGNMENT", "ARIGHT");
-        IupSetAttribute(vbox, "GAP", "10");
-        IupSetAttribute(vbox, "MARGIN", "10x10");
-
-        dlg = IupDialog(vbox);
-        IupSetAttribute(dlg, "TITLE", "Error!");
-        IupSetAttribute(dlg, "MAXBOX", "No");
-        IupSetAttribute(dlg, "MINBOX", "No");
-
-        /* Registers callbacks */
-        IupSetCallback(button, "ACTION", (Icallback)btn_create_random_keyword_cb);
-        IupSetCallback(button_2, "ACTION", (Icallback)btn_cancel_cb);
-
-        IupShowXY(dlg, IUP_CENTER, IUP_CENTER);
-        IupMainLoop();
-        IupDestroy(dlg); //Hủy bản cảnh báo
+    if (source_len == 0) {
+        IupMessage("Baka do ngoc", "Chua nhap gi kia :v");
         return IUP_DEFAULT;
     }
+
+    switch (cypher) {
+    case 1:
+
+        sprintf(keyword, "%s", IupGetAttribute(text_keyword, "VALUE"));
+
+        if (!keyword_check(keyword)) {
+
+            IupMessage("Error!", "Keyword is not suitable");
+
+            return IUP_DEFAULT;
+
+        }
+
+        /*Tạo dialog nếu keyword bỏ trống*/
+        if (toggle_state) {
+            free(keyword);
+            keyword_len = (rand() % (20 - 10 + 1)) + 10;
+            keyword = (char*)malloc(sizeof(char) * (keyword_len + 1));
+            random_keyword(keyword, keyword_len);
+            IupSetAttribute(text_keyword, "VALUE", keyword);
+        }
+        else if (!toggle_state && keyword_len == 0) {
+
+            Ihandle* button, * button_2, * label, * dlg, * vbox;
+
+            label = IupLabel("You haven't entered any keyword. Do you want to create a random one ?");
+            IupSetAttribute(label, "PADDING", "10x20");
+            button = IupButton("OK", NULL);
+            button_2 = IupButton("Cancel", NULL);
+            IupSetAttribute(button, "PADDING", "30x2");
+            IupSetAttribute(button_2, "PADDING", "30x2");
+
+            vbox = IupVbox(
+                label,
+                IupHbox(button, button_2, NULL),
+                NULL);
+            IupSetAttribute(vbox, "ALIGNMENT", "ARIGHT");
+            IupSetAttribute(vbox, "GAP", "10");
+            IupSetAttribute(vbox, "MARGIN", "10x10");
+
+            dlg = IupDialog(vbox);
+            IupSetAttribute(dlg, "TITLE", "Error!");
+            IupSetAttribute(dlg, "MAXBOX", "No");
+            IupSetAttribute(dlg, "MINBOX", "No");
+
+            /* Registers callbacks */
+            IupSetCallback(button, "ACTION", (Icallback)btn_create_random_keyword_cb);
+            IupSetCallback(button_2, "ACTION", (Icallback)btn_cancel_cb);
+
+            IupShowXY(dlg, IUP_CENTER, IUP_CENTER);
+            IupMainLoop();
+            IupDestroy(dlg); //Hủy bản cảnh báo
+            return IUP_DEFAULT;
+        }
 
         sprintf(source, "%s", IupGetAttribute(text_source, "VALUE"));
         sprintf(res, "%s", IupGetAttribute(text_res, "VALUE"));
@@ -519,12 +706,13 @@ int btn_encrypt_vigenere_cb(Ihandle* self) {
         encrypt_vigenere(source, res);
 
         IupSetAttribute(text_res, "VALUE", res);
-
-        free(source);
-        free(keyword);
-        free(res);
-        return IUP_DEFAULT;
- }
+        break;
+    };
+    free(source);
+    free(keyword);
+    free(res);
+    return IUP_DEFAULT;
+}
  
 
     /* nút descrypt */
@@ -611,8 +799,63 @@ int btn_encrypt_vigenere_cb(Ihandle* self) {
         return IUP_DEFAULT;
     }
 
-    int btn_encrypt_3(Ihandle* self) {
-        IupMessage("Test", "4");
+    int btn_descrypt_A1Z26_cb(Ihandle* self) {
+        Ihandle* text_res;
+        Ihandle* text_source;
+
+        text_source = IupGetDialogChild(self, "SOURCE");
+        text_res = IupGetDialogChild(self, "RES");
+
+        int source_len = strlen(IupGetAttribute(text_source, "VALUE"));
+        int res_len = descrypt_length(IupGetAttribute(text_source, "VALUE"), source_len);
+
+        if (source_len == 0) {
+            IupMessage("Baka do ngoc", "Chua nhap gi kia :v");
+            return IUP_DEFAULT;
+        }
+
+        char* source = (char*)malloc(sizeof(char) * (source_len + 1));
+        char* res = (char*)malloc(sizeof(char) * (res_len + 1));
+
+        sprintf(source, "%s", IupGetAttribute(text_source, "VALUE"));
+        sprintf(res, "%s", "");
+
+        descrypt_A1Z26(source,res);
+
+        IupSetAttribute(text_res, "VALUE", res);
+
+        free(source);
+        free(res);
+        return IUP_DEFAULT;
+    }
+
+    int btn_encrypt_A1Z26_cb(Ihandle* self) {
+        Ihandle* text_res;
+        Ihandle* text_source;
+
+        text_source = IupGetDialogChild(self, "SOURCE");
+        text_res = IupGetDialogChild(self, "RES");
+
+        int source_len = strlen(IupGetAttribute(text_source, "VALUE"));
+        int res_len = encrypt_length(IupGetAttribute(text_source, "VALUE"),source_len);
+
+        if (source_len == 0) {
+            IupMessage("Baka do ngoc", "Chua nhap gi kia :v");
+            return IUP_DEFAULT;
+        }
+
+        char* source = (char*)malloc(sizeof(char) * (source_len + 1));
+        char* res = (char*)malloc(sizeof(char) * (res_len + 1));
+
+        sprintf(source, "%s", IupGetAttribute(text_source, "VALUE"));
+        sprintf(res, "%s","");
+
+        encrypt_A1Z26(source, res);
+
+        IupSetAttribute(text_res, "VALUE", res);
+
+        free(source);
+        free(res);
         return IUP_DEFAULT;
     }
 
@@ -652,7 +895,9 @@ int btn_encrypt_vigenere_cb(Ihandle* self) {
             IupRefresh(self);
             break;
         case 3:
-            IupSetCallback(btn_encrypt, "ACTION", (Icallback)btn_encrypt_3);
+            IupSetCallback(btn_encrypt, "ACTION", (Icallback)btn_encrypt_A1Z26_cb);
+            IupSetCallback(btn_descrypt, "ACTION", (Icallback)btn_descrypt_A1Z26_cb);
+
             IupSetAttribute(frame_keyword, "VISIBLE", "NO");
             IupSetAttribute(frame_keyword, "FLOATING", "YES");
             IupRefresh(self);
