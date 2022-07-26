@@ -437,10 +437,11 @@ int btn_clear_cb(Ihandle* self) {
 
 /* nút encrypt */
 int btn_encrypt_vigenere_cb(Ihandle* self) {
-    Ihandle* text_res;
-    Ihandle* text_source;
-    Ihandle* text_keyword;
-    Ihandle* toggle;
+    Ihandle* text_res = NULL;
+    Ihandle* text_source = NULL;
+    Ihandle* text_keyword = NULL;
+    Ihandle* toggle = NULL;
+    int cypher = 1;
 
     text_keyword = IupGetHandle("text_keyword");
     text_source = IupGetHandle("text_source");
@@ -450,7 +451,112 @@ int btn_encrypt_vigenere_cb(Ihandle* self) {
     int source_len = strlen(IupGetAttribute(text_source, "VALUE"));
     int keyword_len = strlen(IupGetAttribute(text_keyword, "VALUE"));
     int toggle_state = IupGetInt(toggle, "VALUE");
+
+    char* source = (char*)malloc(sizeof(char) * (source_len + 1));
+    char* keyword = (char*)malloc(sizeof(char) * (keyword_len + 1));
+    char* res = (char*)malloc(sizeof(char) * (source_len + 1));
+
     if (source_len == 0) {
+        IupMessage("Baka do ngoc", "Chua nhap gi kia :v");
+        return IUP_DEFAULT;
+    }
+
+    switch (cypher) {
+    case 1:
+
+        sprintf(keyword, "%s", IupGetAttribute(text_keyword, "VALUE"));
+
+        if (!keyword_check(keyword)) {
+
+            IupMessage("Error!", "Keyword is not suitable");
+
+            return IUP_DEFAULT;
+
+        }
+
+        /*Tạo dialog nếu keyword bỏ trống*/
+        if (toggle_state) {
+            free(keyword);
+            keyword_len = (rand() % (20 - 10 + 1)) + 10;
+            keyword = (char*)malloc(sizeof(char) * (keyword_len + 1));
+            random_keyword(keyword, keyword_len);
+            IupSetAttribute(text_keyword, "VALUE", keyword);
+        }
+        else if (!toggle_state && keyword_len == 0) {
+
+            Ihandle* button, * button_2, * label, * dlg, * vbox;
+
+            label = IupLabel("You haven't entered any keyword. Do you want to create a random one ?");
+            IupSetAttribute(label, "PADDING", "10x20");
+            button = IupButton("OK", NULL);
+            button_2 = IupButton("Cancel", NULL);
+            IupSetAttribute(button, "PADDING", "30x2");
+            IupSetAttribute(button_2, "PADDING", "30x2");
+
+            vbox = IupVbox(
+                label,
+                IupHbox(button, button_2, NULL),
+                NULL);
+            IupSetAttribute(vbox, "ALIGNMENT", "ARIGHT");
+            IupSetAttribute(vbox, "GAP", "10");
+            IupSetAttribute(vbox, "MARGIN", "10x10");
+
+            dlg = IupDialog(vbox);
+            IupSetAttribute(dlg, "TITLE", "Error!");
+            IupSetAttribute(dlg, "MAXBOX", "No");
+            IupSetAttribute(dlg, "MINBOX", "No");
+
+            /* Registers callbacks */
+            IupSetCallback(button, "ACTION", (Icallback)btn_create_random_keyword_cb);
+            IupSetCallback(button_2, "ACTION", (Icallback)btn_cancel_cb);
+
+            IupShowXY(dlg, IUP_CENTER, IUP_CENTER);
+            IupMainLoop();
+            IupDestroy(dlg); //Hủy bản cảnh báo
+            return IUP_DEFAULT;
+        }
+
+        sprintf(source, "%s", IupGetAttribute(text_source, "VALUE"));
+        sprintf(res, "%s", IupGetAttribute(text_res, "VALUE"));
+        sprintf(res, "%s", source);
+        replace_char(source, res, keyword);
+        encrypt_vigenere(source, res);
+
+        IupSetAttribute(text_res, "VALUE", res);
+        break;
+    case 2:
+        // Chỗ này là để in số trong khung số.
+        // Tạo số mặc định cho khung số
+        //Tạo warning nếu không nhập số
+        sprintf(source, "%s", IupGetAttribute(text_source, "VALUE"));
+        sprintf(res, "%s", IupGetAttribute(text_res, "VALUE"));
+        sprintf(res, "%s", source);
+        encrypt_ceasar(source, res);
+
+        IupSetAttribute(text_res, "VALUE", res);
+        break;
+    };
+    free(source);
+    free(keyword);
+    free(res);
+        return IUP_DEFAULT;
+ }
+ 
+
+    /* nút descrypt */
+int btn_descrypt_vigenere_cb(Ihandle * self) {
+    Ihandle* text_res;
+    Ihandle* text_source;
+    Ihandle* text_keyword;
+
+    text_keyword = IupGetDialogChild(self, "KEYWORD");
+    text_source = IupGetDialogChild(self, "SOURCE");
+    text_res = IupGetDialogChild(self, "RES");
+
+    int source_len = strlen(IupGetAttribute(text_source, "VALUE"));
+    int keyword_len = strlen(IupGetAttribute(text_keyword, "VALUE"));
+
+    if (source_len == 0 || keyword_len == 0) {
         IupMessage("Baka do ngoc", "Chua nhap gi kia :v");
         return IUP_DEFAULT;
     }
@@ -461,115 +567,25 @@ int btn_encrypt_vigenere_cb(Ihandle* self) {
 
     sprintf(keyword, "%s", IupGetAttribute(text_keyword, "VALUE"));
 
-    if (!keyword_check(keyword)) {
-
-        IupMessage("Error!", "Keyword is not suitable");
-
-        return IUP_DEFAULT;
-
-    }
-
-    /*Tạo dialog nếu keyword bỏ trống*/
-    if (toggle_state) {
-        free(keyword);
-        keyword_len = (rand() % (20 - 10 + 1)) + 10;
-        keyword = (char*)malloc(sizeof(char) * (keyword_len + 1));
-        random_keyword(keyword, keyword_len);
-        IupSetAttribute(text_keyword, "VALUE", keyword);
-    }
-    else if (!toggle_state && keyword_len ==0) {
-       
-        Ihandle* button, * button_2, * label, * dlg, * vbox;
-
-        label = IupLabel("You haven't entered any keyword. Do you want to create a random one ?");
-        IupSetAttribute(label, "PADDING", "10x20");
-        button = IupButton("OK", NULL);
-        button_2 = IupButton("Cancel", NULL);
-        IupSetAttribute(button, "PADDING", "30x2");
-        IupSetAttribute(button_2, "PADDING", "30x2");
-
-        vbox = IupVbox(
-            label,
-            IupHbox(button, button_2, NULL),
-            NULL);
-        IupSetAttribute(vbox, "ALIGNMENT", "ARIGHT");
-        IupSetAttribute(vbox, "GAP", "10");
-        IupSetAttribute(vbox, "MARGIN", "10x10");
-
-        dlg = IupDialog(vbox);
-        IupSetAttribute(dlg, "TITLE", "Error!");
-        IupSetAttribute(dlg, "MAXBOX", "No");
-        IupSetAttribute(dlg, "MINBOX", "No");
-
-        /* Registers callbacks */
-        IupSetCallback(button, "ACTION", (Icallback)btn_create_random_keyword_cb);
-        IupSetCallback(button_2, "ACTION", (Icallback)btn_cancel_cb);
-
-        IupShowXY(dlg, IUP_CENTER, IUP_CENTER);
-        IupMainLoop();
-        IupDestroy(dlg); //Hủy bản cảnh báo
+    if (keyword_check(keyword) == 0) {
+        IupMessage("Baka do ngoc", "Nhap sai keyword roi kia :v");
         return IUP_DEFAULT;
     }
 
-        sprintf(source, "%s", IupGetAttribute(text_source, "VALUE"));
-        sprintf(res, "%s", IupGetAttribute(text_res, "VALUE"));
+    sprintf(source, "%s", IupGetAttribute(text_source, "VALUE"));
+    sprintf(res, "%s", IupGetAttribute(text_res, "VALUE"));
 
-        sprintf(res, "%s", source);
-        replace_char(source, res, keyword);
-        encrypt_vigenere(source, res);
+    sprintf(res, "%s", source);
+    replace_char(source, res, keyword);
+    descrypt_vigenere(source, res);
 
-        IupSetAttribute(text_res, "VALUE", res);
+    IupSetAttribute(text_res, "VALUE", res);
 
-        free(source);
-        free(keyword);
-        free(res);
-        return IUP_DEFAULT;
+    free(source);
+    free(keyword);
+    free(res);
+    return IUP_DEFAULT;
  }
- 
-
-    /* nút descrypt */
-    int btn_descrypt_vigenere_cb(Ihandle * self) {
-        Ihandle* text_res;
-        Ihandle* text_source;
-        Ihandle* text_keyword;
-
-        text_keyword = IupGetDialogChild(self, "KEYWORD");
-        text_source = IupGetDialogChild(self, "SOURCE");
-        text_res = IupGetDialogChild(self, "RES");
-
-        int source_len = strlen(IupGetAttribute(text_source, "VALUE"));
-        int keyword_len = strlen(IupGetAttribute(text_keyword, "VALUE"));
-
-        if (source_len == 0 || keyword_len == 0) {
-            IupMessage("Baka do ngoc", "Chua nhap gi kia :v");
-            return IUP_DEFAULT;
-        }
-
-        char* source = (char*)malloc(sizeof(char) * (source_len + 1));
-        char* keyword = (char*)malloc(sizeof(char) * (keyword_len + 1));
-        char* res = (char*)malloc(sizeof(char) * (source_len + 1));
-
-        sprintf(keyword, "%s", IupGetAttribute(text_keyword, "VALUE"));
-
-        if (keyword_check(keyword) == 0) {
-            IupMessage("Baka do ngoc", "Nhap sai keyword roi kia :v");
-            return IUP_DEFAULT;
-        }
-
-        sprintf(source, "%s", IupGetAttribute(text_source, "VALUE"));
-        sprintf(res, "%s", IupGetAttribute(text_res, "VALUE"));
-
-        sprintf(res, "%s", source);
-        replace_char(source, res, keyword);
-        descrypt_vigenere(source, res);
-
-        IupSetAttribute(text_res, "VALUE", res);
-
-        free(source);
-        free(keyword);
-        free(res);
-        return IUP_DEFAULT;
-    }
 
     int btn_encrypt_1(Ihandle* self) {
         IupMessage("Test", "1");
