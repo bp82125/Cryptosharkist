@@ -8,7 +8,7 @@
 #include <time.h>
 #include "icon.h"
 #include <iupkey.h>
-
+#include <ctype.h>
 /******************************-Xử lí chuỗi-*********************************/
 
 char* read_file(const char* filename)
@@ -154,37 +154,45 @@ void descrypt_ceasar(char res[]) {
     }
 }
 
+// hàm kiểm tra kí tự đó có phải là bảng chữ cái không
 int is_alphabet(char c) {
     if ('A' <= c && c <= 'Z') return 1;
     if ('a' <= c && c <= 'z') return 1;
     return 0;
 }
 
+//state machine đơn giản trả về các trạng thái khác nhau để xử lí
 int encrypt_state_check(char* str, int len, int index) {
     char current = str[index];
 
+    //nếu là kí tự đầu tiên và là chữ cái
     if (index == len - 1 && is_alphabet(current)) {
         return 2;
     }
+    //nếu là kí tự đầu tiên và không phải chữ cái
     if (index == len - 1 && !is_alphabet(current)) {
         return 3;
     }
-
+    
+    //nếu kí tự hiện tại không phải chữ cái
     if (!is_alphabet(current)) {
         return 3;
     }
 
     char next = str[index + 1];
 
+    // kí tự hiện tại và kế tiếp đều là chữ cái
     if (is_alphabet(current) && is_alphabet(next)) {
         return 1;
     }
+    // kí tự hiện tại là chữ cái và kí tự kí tiếp là kí tự đặc biệt
     if (is_alphabet(current) && !is_alphabet(next)) {
         return 2;
     }
     return 0;
 }
 
+// hàm mã hoá A1Z26
 void encrypt_A1Z26(char* str, char* res) {
     int n = strlen(str);
     int state = 0;
@@ -192,12 +200,15 @@ void encrypt_A1Z26(char* str, char* res) {
     for (int i = 0; i < n; ++i) {
         state = encrypt_state_check(str, n, i);
         switch (state) {
+        // trường hợp hiện kí tự hiện tại và kế tiếp đều là chữ cái
         case 1:
             offset += sprintf(res + offset, "%d-", tolower(str[i]) - 'a' + 1);
             break;
+        // trường hợp kí tự hiện tại là chữ cái và kế tiếp là kí tự đặc biệt
         case 2:
             offset += sprintf(res + offset, "%d", tolower(str[i]) - 'a' + 1);
             break;
+        // trường hợp hiện tại là kí tự đặc biệt
         case 3:
             offset += sprintf(res + offset, "%c", str[i]);
             break;
@@ -205,21 +216,23 @@ void encrypt_A1Z26(char* str, char* res) {
     }
 }
 
+// hàm tính toán độ dài của chuỗi đã mã hoá
 int encrypt_length(char* str, int len) {
     int count = 0;
     int state = 0;
     for (int i = 0; i < len; ++i) {
         state = encrypt_state_check(str, len, i);
         switch (state) {
-        case 1:
-            if (str[i] >= 'j' && str[i] <= 'z') {
+        case 1: // trường hợp kết quả là %c-
+            if (str[i] >= 'j' && str[i] <= 'z') { 
                 count += 3;
             }
             else {
                 count += 2;
             }
             break;
-        case 2:
+        // trường hợp kết quả là %c
+        case 2: 
             if (str[i] >= 'j' && str[i] <= 'z') {
                 count += 2;
             }
@@ -227,6 +240,7 @@ int encrypt_length(char* str, int len) {
                 count += 1;
             }
             break;
+        // trường hợp kí tự đặc biệt
         case 3:
             count++;
             break;
@@ -235,78 +249,106 @@ int encrypt_length(char* str, int len) {
     return count;
 }
 
+// kiểm tra kí tự hiện tại có phải chữ số không
 int is_number(char c) {
     if ('0' <= c && c <= '9') return 1;
     return 0;
 }
 
+// state machine đơn giản trả về trạng thái của sự chuyển tiếp kí tự trước và kí tự hiện tại
 int descrypt_state_check(char source[], int len, int index) {
     int current = source[index];
 
+    // trường hợp là kí tự đầu và là chữ cái
     if (index == 0 && is_number(current)) {
         return 1;
     }
+    // trường hợp kí tự đầu và là kí tự đặc biệt
     if (index == 0 && !is_number(current)) {
         return 4;
     }
 
     int previous = source[index - 1];
 
+    // nếu là kí tự cuối và là số
     if (index == len - 1 && is_number(current)) {
         return 5;
     }
+    // kí tự cuối và chuyển từ số sang kí tự đặc biệt
     if (index == len - 1 && !is_number(current) && is_number(previous)) {
         return 6;
     }
+    // kí tự cuối và chuyển từ kí tự đặc biệt sang kí tự đặc biệt
     if (index == len - 1 && !is_number(current) && !is_number(previous)) {
         return 4;
     }
 
+    // chuyển từ kí tự đặc biệt sang số
     if (is_number(current) && !is_number(previous)) {
         return 1;
     }
+    // chuyển từ số sang số
     if (is_number(current) && is_number(previous)) {
         return 2;
     }
+    // chuyển từ số sang kí tự đặc biệt
     if (!is_number(current) && is_number(previous)) {
         return 3;
     }
+    // chuyển từ kí tự đặc biệt sang kí tự đặc biệt
     if (!is_number(current) && !is_number(previous)) {
         return 4;
     }
     return 0;
 }
 
+// hàm giải mã A1Z26
 void descrypt_A1Z26(char* source, char* res) {
     int n = strlen(source);
-    int state;
+    int state = 0;
     int number;
     int offset = 0;
     for (int i = 0; i < n; ++i) {
         state = descrypt_state_check(source, n, i);
         switch (state) {
+        // trường hợp kí tự đặc biệt sang số
         case 1:
             number = source[i] - '0';
             break;
+        // trường hợp số sang số
         case 2:
             number = number * 10 + source[i] - '0';
             break;
+        // trường hợp chuyển từ số sang kí tự đặc biệt
         case 3:
-            offset += sprintf(res + offset, "%c", number + 'a' - 1);
-            number = 0;
+            if (number > 0 && number < 27) {
+                offset += sprintf(res + offset, "%c", number + 'a' - 1);
+            }
+            else {
+                offset += sprintf(res + offset, "%d", number);
+            }
             if (source[i] == '-' && !is_number(source[i + 1])) {
                 offset += sprintf(res + offset, "%s", "-");
             }
             if (source[i] != '-')
                 offset += sprintf(res + offset, "%c", source[i]);
+            number = 0;
             break;
+        // trường hợp kí tự đặc biệt sang kí tự đặc biệt
         case 4:
             offset += sprintf(res + offset, "%c", source[i]);
             break;
         case 5:
-            number = number * 10 + source[i] - '0' + 'a' - 1;
-            offset += sprintf(res + offset, "%c", number);
+        // kí tự cuối là số
+            number = number * 10 + source[i] - '0';
+            if (number > 0 && number < 27) {
+                offset += sprintf(res + offset, "%c", number + 'a' - 1);
+            }
+            else {
+                offset += sprintf(res + offset, "%d", number);
+            }
             break;
+        // kí tự cuối là kí tự đặc biệt
         case 6:
             offset += sprintf(res + offset, "%c", number + 'a' - 1);
             offset += sprintf(res + offset, "%c", source[i]);
@@ -315,18 +357,27 @@ void descrypt_A1Z26(char* source, char* res) {
     }
 }
 
+// hàm tính độ dài chuỗi sau khi giải mã
 int descrypt_length(char* source, int len) {
     int state = 0;
     int count = 0;
+    int number = 0;
     for (int i = 0; i < len; ++i) {
         state = descrypt_state_check(source, len, i);
         switch (state) {
         case 1:
+            number = source[i] - '0';
             count++;
             break;
         case 2:
+            number = number * 10 + source[i] - '0';
+            count++;
             break;
         case 3:
+            if (10 <= number && number <= 26) {
+                count--;
+            }
+            number = 0;
             if (source[i] != '-')
                 count++;
             else if (source[i] == '-' && !is_number(source[i + 1]))
@@ -336,6 +387,10 @@ int descrypt_length(char* source, int len) {
             count++;
             break;
         case 5:
+            number = number * 10 + source[i] - '0';
+            if (number > 26) {
+                count++;
+            }
             if (!is_number(source[i - 1])) {
                 count++;
             }
@@ -347,6 +402,7 @@ int descrypt_length(char* source, int len) {
     }
     return count;
 }
+
 /******************************-Xử lí các thành phần trên các submenu-*********************************/
 
 /*nút mở và đọc file */
