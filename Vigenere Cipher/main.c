@@ -9,6 +9,7 @@
 #include "icon.h"
 #include <iupkey.h>
 #include <ctype.h>
+
 /******************************-Xử lí chuỗi-*********************************/
 
 char* read_file(const char* filename)
@@ -767,7 +768,7 @@ int btn_encrypt_vigenere_cb(Ihandle* self) {
         sprintf(source, "%s", IupGetAttribute(text_source, "VALUE"));
         sprintf(res, "%s", IupGetAttribute(text_res, "VALUE"));
         sprintf(res, "%s", source);
-        encrypt_ceasar(source, res);
+        //encrypt_ceasar(source, res);
 
         IupSetAttribute(text_res, "VALUE", res);
         break;
@@ -911,6 +912,8 @@ int btn_descrypt_vigenere_cb(Ihandle * self) {
         char* source = (char*)malloc(sizeof(char) * (source_len + 1));
         char* res = (char*)malloc(sizeof(char) * (res_len + 1));
 
+        char* current = malloc(256);
+        IupMessage("text", current);
         sprintf(source, "%s", IupGetAttribute(text_source, "VALUE"));
         sprintf(res, "%s","");
 
@@ -918,6 +921,7 @@ int btn_descrypt_vigenere_cb(Ihandle * self) {
 
         IupSetAttribute(text_res, "VALUE", res);
 
+        free(current);
         free(source);
         free(res);
         return IUP_DEFAULT;
