@@ -9,7 +9,10 @@
 #include "icon.h"
 #include <iupkey.h>
 #include <ctype.h>
-
+#include <stddef.h>
+#include <stdint.h>
+#include "utf8.h"
+#include "anyascii.h"
 /******************************-Xử lí chuỗi-*********************************/
 
 char* read_file(const char* filename)
@@ -402,6 +405,27 @@ int descrypt_length(char* source, int len) {
         }
     }
     return count;
+}
+
+static void anyascii_string(char* in, char* out) {
+    uint32_t utf32;
+    uint32_t state = 0;
+    int len = strlen(in);
+    for (int i = 0; i < len; ++i) {
+        utf8_decode(&state, &utf32, (unsigned char)in[i]);
+        switch (state) {
+        case UTF8_ACCEPT:;
+            const char* r;
+            size_t rlen = anyascii(utf32, &r);
+            memcpy(out, r, rlen);
+            out += rlen;
+            break;
+        case UTF8_REJECT:
+            state = UTF8_ACCEPT;
+            break;
+        }
+    }
+    *out = 0;
 }
 
 /******************************-Xử lí các thành phần trên các submenu-*********************************/
@@ -912,16 +936,13 @@ int btn_descrypt_vigenere_cb(Ihandle * self) {
         char* source = (char*)malloc(sizeof(char) * (source_len + 1));
         char* res = (char*)malloc(sizeof(char) * (res_len + 1));
 
-        char* current = malloc(256);
-        IupMessage("text", current);
-        sprintf(source, "%s", IupGetAttribute(text_source, "VALUE"));
+        anyascii_string(IupGetAttribute(text_source, "VALUE"), source);
         sprintf(res, "%s","");
 
         encrypt_A1Z26(source, res);
 
         IupSetAttribute(text_res, "VALUE", res);
 
-        free(current);
         free(source);
         free(res);
         return IUP_DEFAULT;
