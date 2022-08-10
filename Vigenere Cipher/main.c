@@ -943,7 +943,6 @@ int btn_descrypt_vigenere_cb(Ihandle * self) {
 
         IupSetAttribute(text_res, "VALUE", res);
 
-        free(current);
         free(source);
         free(res);
         return IUP_DEFAULT;
