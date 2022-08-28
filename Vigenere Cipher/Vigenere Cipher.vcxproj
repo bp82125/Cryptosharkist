@@ -190,7 +190,14 @@
   <ItemGroup>
     <ClInclude Include="anyascii.h" />
     <ClInclude Include="icon.h" />
+    <ClInclude Include="resource.h" />
     <ClInclude Include="utf8.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Vigenere Cipher.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="C:\Users\Admin\Downloads\shark-_1_.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
