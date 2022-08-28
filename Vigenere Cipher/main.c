@@ -127,7 +127,7 @@ void encrypt_vigenere(char source[], char res[]) {
 }
 
 /* hàm giải mã */
-void descrypt_vigenere(char source[], char res[]) {
+void decrypt_vigenere(char source[], char res[]) {
     int n = strlen(source);
     for (int i = 0; i < n; i++) {
         if (source[i] == ' ') {
@@ -147,7 +147,7 @@ void descrypt_vigenere(char source[], char res[]) {
     }
 }
 
-void descrypt_ceasar(char res[]) {
+void decrypt_ceasar(char res[]) {
     int n = strlen(res);
     for (int i = 0; i < n; ++i) {
         if (res[i] >= 'a' && res[i] <= 'z') {
@@ -261,7 +261,7 @@ int is_number(char c) {
 }
 
 // state machine đơn giản trả về trạng thái của sự chuyển tiếp kí tự trước và kí tự hiện tại
-int descrypt_state_check(char source[], int len, int index) {
+int decrypt_state_check(char source[], int len, int index) {
     int current = source[index];
 
     // trường hợp là kí tự đầu và là chữ cái
@@ -308,13 +308,13 @@ int descrypt_state_check(char source[], int len, int index) {
 }
 
 // hàm giải mã A1Z26
-void descrypt_A1Z26(char* source, char* res) {
+void decrypt_A1Z26(char* source, char* res) {
     int n = strlen(source);
     int state = 0;
     int number = 0; 
     int offset = 0;
     for (int i = 0; i < n; ++i) {
-        state = descrypt_state_check(source, n, i);
+        state = decrypt_state_check(source, n, i);
         switch (state) {
         // trường hợp kí tự đặc biệt sang số
         case 1:
@@ -363,12 +363,12 @@ void descrypt_A1Z26(char* source, char* res) {
 }
 
 // hàm tính độ dài chuỗi sau khi giải mã
-int descrypt_length(char* source, int len) {
+int decrypt_length(char* source, int len) {
     int state = 0;
     int count = 0;
     int number = 0;
     for (int i = 0; i < len; ++i) {
-        state = descrypt_state_check(source, len, i);
+        state = decrypt_state_check(source, len, i);
         switch (state) {
         case 1:
             number = source[i] - '0';
@@ -416,7 +416,7 @@ void encrypt_hexadecimal(char* in, char* out) {
     }
 }
 
-void descrypt_hexadecimal(char* in, char* out) {
+void decrypt_hexadecimal(char* in, char* out) {
     char temp[3];
     int len = strlen(in);
     int offset = 0;
@@ -735,25 +735,18 @@ int btn_encrypt_vigenere_cb(Ihandle* self) {
     text_res = IupGetHandle("text_res");
     toggle = IupGetHandle("toggle");
 
-    int source_len = strlen(IupGetAttribute(text_source, "VALUE"));
-    int keyword_len = strlen(IupGetAttribute(text_keyword, "VALUE"));
-    int toggle_state = IupGetInt(toggle, "VALUE");
+    size_t source_len = strlen(IupGetAttribute(text_source, "VALUE"));
+    size_t keyword_len = strlen(IupGetAttribute(text_keyword, "VALUE"));
+    size_t toggle_state = IupGetInt(toggle, "VALUE");
 
     char* source = (char*)malloc(sizeof(char) * (source_len + 1));
     char* keyword = (char*)malloc(sizeof(char) * (keyword_len + 1));
     char* res = (char*)malloc(sizeof(char) * (source_len + 1));
 
-    if (source_len == 0) {
-        IupMessage("Baka do ngoc", "Chua nhap gi kia :v");
-        return IUP_DEFAULT;
-    }
-
     sprintf(keyword, "%s", IupGetAttribute(text_keyword, "VALUE"));
 
-    char c = keyword_check(keyword);
-
     if (keyword_check(keyword)!=1) {
-            IupMessageError(NULL, "Detected invalid character in your input keyword\nYour keyword should contain only a-z and A-Z characters with no white space!");
+            IupMessageError(NULL, "Detected invalid characters in your input keyword\nYour keyword should contain only a-z and A-Z characters with no white space!");
             return IUP_DEFAULT;
      }
 
@@ -782,6 +775,24 @@ int btn_encrypt_vigenere_cb(Ihandle* self) {
         sprintf(res, "%s", IupGetAttribute(text_res, "VALUE"));
         sprintf(res, "%s", source);
 
+        for (size_t i = 0; i < source_len; ++i) {
+            if (source[i] > 255 || source[i] < 0) {
+                switch (IupMessageAlarm(NULL, "Warning!", "Detected Unicode characters\nDo you want to convert them to their best ASCII representation", "YESNOCANCEL"))
+                {
+                    case 1:
+                        anyascii_string(source, res);
+                        sprintf(source, "%s", res);
+                        IupSetAttribute(text_source, "VALUE", source);
+                        break;
+                    case 2:
+                        break;
+                    case 3:
+                        return IUP_DEFAULT;
+                }
+                break;
+            }
+        }
+
         replace_char(source, res, keyword);
         encrypt_vigenere(source, res);
 
@@ -794,8 +805,8 @@ int btn_encrypt_vigenere_cb(Ihandle* self) {
  }
  
 
-    /* nút descrypt */
-int btn_descrypt_vigenere_cb(Ihandle * self) {
+    /* nút decrypt */
+int btn_decrypt_vigenere_cb(Ihandle * self) {
     Ihandle* text_res;
     Ihandle* text_source;
     Ihandle* text_keyword;
@@ -804,13 +815,8 @@ int btn_descrypt_vigenere_cb(Ihandle * self) {
     text_source = IupGetDialogChild(self, "SOURCE");
     text_res = IupGetDialogChild(self, "RES");
 
-    int source_len = strlen(IupGetAttribute(text_source, "VALUE"));
-    int keyword_len = strlen(IupGetAttribute(text_keyword, "VALUE"));
-
-    if (source_len == 0 || keyword_len == 0) {
-        IupMessage("Baka do ngoc", "Chua nhap gi kia :v");
-        return IUP_DEFAULT;
-    }
+    size_t source_len = strlen(IupGetAttribute(text_source, "VALUE"));
+    size_t keyword_len = strlen(IupGetAttribute(text_keyword, "VALUE"));
 
     char* source = (char*)malloc(sizeof(char) * (source_len + 1));
     char* keyword = (char*)malloc(sizeof(char) * (keyword_len + 1));
@@ -818,8 +824,12 @@ int btn_descrypt_vigenere_cb(Ihandle * self) {
 
     sprintf(keyword, "%s", IupGetAttribute(text_keyword, "VALUE"));
 
-    if (keyword_check(keyword) == 0) {
-        IupMessage("Baka do ngoc", "Nhap sai keyword roi kia :v");
+    if (keyword_len == 0) {
+        IupMessageError(NULL, "Your keyword cannot be left blank");
+        return IUP_DEFAULT;
+    }
+    if (keyword_check(keyword) != 1) {
+        IupMessageError(NULL, "Detected invalid characters in your input keyword\nYour keyword should contain only a-z and A-Z characters with no white space!");
         return IUP_DEFAULT;
     }
 
@@ -828,7 +838,7 @@ int btn_descrypt_vigenere_cb(Ihandle * self) {
 
     sprintf(res, "%s", source);
     replace_char(source, res, keyword);
-    descrypt_vigenere(source, res);
+    decrypt_vigenere(source, res);
 
     IupSetAttribute(text_res, "VALUE", res);
 
@@ -848,7 +858,7 @@ int btn_descrypt_vigenere_cb(Ihandle * self) {
         return IUP_DEFAULT;
     }
 
-    int btn_descrypt_ceasar_cb(Ihandle* self) {
+    int btn_decrypt_ceasar_cb(Ihandle* self) {
         Ihandle* text_res;
         Ihandle* text_source;
 
@@ -869,7 +879,7 @@ int btn_descrypt_vigenere_cb(Ihandle * self) {
         sprintf(res, "%s", IupGetAttribute(text_res, "VALUE"));
 
         sprintf(res, "%s", source);
-        descrypt_ceasar(res);
+        decrypt_ceasar(res);
 
         IupSetAttribute(text_res, "VALUE", res);
 
@@ -878,7 +888,7 @@ int btn_descrypt_vigenere_cb(Ihandle * self) {
         return IUP_DEFAULT;
     }
 
-    int btn_descrypt_A1Z26_cb(Ihandle* self) {
+    int btn_decrypt_A1Z26_cb(Ihandle* self) {
         Ihandle* text_res;
         Ihandle* text_source;
 
@@ -886,7 +896,7 @@ int btn_descrypt_vigenere_cb(Ihandle * self) {
         text_res = IupGetDialogChild(self, "RES");
 
         int source_len = strlen(IupGetAttribute(text_source, "VALUE"));
-        int res_len = descrypt_length(IupGetAttribute(text_source, "VALUE"), source_len);
+        int res_len = decrypt_length(IupGetAttribute(text_source, "VALUE"), source_len);
 
         if (source_len == 0) {
             IupMessage("Baka do ngoc", "Chua nhap gi kia :v");
@@ -899,7 +909,7 @@ int btn_descrypt_vigenere_cb(Ihandle * self) {
         sprintf(source, "%s", IupGetAttribute(text_source, "VALUE"));
         sprintf(res, "%s", "");
 
-        descrypt_A1Z26(source,res);
+        decrypt_A1Z26(source,res);
 
         IupSetAttribute(text_res, "VALUE", res);
 
@@ -968,7 +978,7 @@ int btn_descrypt_vigenere_cb(Ihandle * self) {
         return IUP_DEFAULT;
     }
 
-    int btn_descrypt_hexadecimal_cb(Ihandle* self) {
+    int btn_decrypt_hexadecimal_cb(Ihandle* self) {
         Ihandle* text_res;
         Ihandle* text_source;
 
@@ -989,7 +999,7 @@ int btn_descrypt_vigenere_cb(Ihandle * self) {
         sprintf(source, "%s", IupGetAttribute(text_source, "VALUE"));
         sprintf(res, "%s", "");
 
-        descrypt_hexadecimal(source, res);
+        decrypt_hexadecimal(source, res);
 
         IupSetAttribute(text_res, "VALUE", res);
 
@@ -1006,7 +1016,7 @@ int btn_descrypt_vigenere_cb(Ihandle * self) {
     int list_cb(Ihandle* self, char* t, int i, int v)
     {
         Ihandle* btn_encrypt = IupGetDialogChild(self, "ENCRYPT");
-        Ihandle* btn_descrypt = IupGetDialogChild(self, "DESCRYPT");
+        Ihandle* btn_decrypt = IupGetDialogChild(self, "DESCRYPT");
         Ihandle* frame_keyword = IupGetDialogChild(self, "FRAMEKEYWORD");
         switch (i) {
         case 1:
@@ -1017,7 +1027,7 @@ int btn_descrypt_vigenere_cb(Ihandle * self) {
             break;
         case 2:
             IupSetCallback(btn_encrypt, "ACTION", (Icallback)btn_encrypt_ceasar_cb);
-            IupSetCallback(btn_descrypt, "ACTION", (Icallback)btn_descrypt_ceasar_cb);
+            IupSetCallback(btn_decrypt, "ACTION", (Icallback)btn_decrypt_ceasar_cb);
 
             IupSetAttribute(frame_keyword, "VISIBLE", "NO");
             IupSetAttribute(frame_keyword, "FLOATING", "YES");
@@ -1025,7 +1035,7 @@ int btn_descrypt_vigenere_cb(Ihandle * self) {
             break;
         case 3:
             IupSetCallback(btn_encrypt, "ACTION", (Icallback)btn_encrypt_A1Z26_cb);
-            IupSetCallback(btn_descrypt, "ACTION", (Icallback)btn_descrypt_A1Z26_cb);
+            IupSetCallback(btn_decrypt, "ACTION", (Icallback)btn_decrypt_A1Z26_cb);
 
             IupSetAttribute(frame_keyword, "VISIBLE", "NO");
             IupSetAttribute(frame_keyword, "FLOATING", "YES");
@@ -1039,7 +1049,7 @@ int btn_descrypt_vigenere_cb(Ihandle * self) {
             break;
         case 5:
             IupSetCallback(btn_encrypt, "ACTION", (Icallback)btn_encrypt_hexadecimal_cb);
-            IupSetCallback(btn_descrypt, "ACTION", (Icallback)btn_descrypt_hexadecimal_cb);
+            IupSetCallback(btn_decrypt, "ACTION", (Icallback)btn_decrypt_hexadecimal_cb);
 
             IupSetAttribute(frame_keyword, "VISIBLE", "NO");
             IupSetAttribute(frame_keyword, "FLOATING", "YES");
@@ -1057,7 +1067,7 @@ int btn_descrypt_vigenere_cb(Ihandle * self) {
 
         Ihandle* dlg, * element_box, * vbox;
         Ihandle* text_source, * text_keyword, * text_res;
-        Ihandle* btn_encrypt, * btn_descrypt, * btn_clear;
+        Ihandle* btn_encrypt, * btn_decrypt, * btn_clear;
         Ihandle* frame_encrypt, * frame_keyword, * frame_res;
         Ihandle* item_open, * item_saveas, * item_exit, * item_about;
         Ihandle* item_copy, * item_paste, * item_cut, * item_delete, * item_select_all;
@@ -1087,11 +1097,11 @@ int btn_descrypt_vigenere_cb(Ihandle * self) {
         //khai báo các nút
 
         btn_encrypt = IupButton("Encrypt", NULL);
-        btn_descrypt = IupButton("Descrypt", NULL);
+        btn_decrypt = IupButton("Descrypt", NULL);
         btn_clear = IupButton("Clear", NULL);
 
         IupSetAttribute(btn_encrypt, "NAME", "ENCRYPT");
-        IupSetAttribute(btn_descrypt, "NAME", "DESCRYPT");
+        IupSetAttribute(btn_decrypt, "NAME", "DESCRYPT");
         IupSetAttribute(btn_clear, "NAME", "CLEAR");
 
         //khai báo và điều chỉnh các nút trên toolbar
@@ -1172,11 +1182,11 @@ int btn_descrypt_vigenere_cb(Ihandle * self) {
         //khai báo list đổi mã
 
         list = IupList(NULL);
-        IupSetAttributes(list, "1=\"Vigenere Cipher\", 2=\"Ceasar Cipher\", 3=\"A1Z26 Cipher\", 4=\"Binary\", 5=\"Hexadecimal\","
+        IupSetAttributes(list, "1=\"Vigenère\", 2=\"Ceasar\", 3=\"A1Z26\", 4=\"Binary\", 5=\"Hexadecimal\","
             "DROPDOWN=YES , VALUE=\"+--+--\", SIZE=EIGHTHxEIGHTH");
 
         IupSetCallback(list, "ACTION", (Icallback)list_cb);
-
+        IupSetAttribute(list, "VALUE", "1");
         //khai báo các phần tử sub menu help
 
         item_about = IupItem("About", NULL);
@@ -1242,7 +1252,7 @@ int btn_descrypt_vigenere_cb(Ihandle * self) {
             frame_keyword,
             IupHbox(
                 btn_encrypt,
-                btn_descrypt,
+                btn_decrypt,
                 btn_clear,
                 NULL),
             frame_res,
@@ -1275,7 +1285,7 @@ int btn_descrypt_vigenere_cb(Ihandle * self) {
         //điều chỉnh các nút
 
         IupSetAttribute(btn_encrypt, "PADDING", "30x2");
-        IupSetAttribute(btn_descrypt, "PADDING", "30x2");
+        IupSetAttribute(btn_decrypt, "PADDING", "30x2");
         IupSetAttribute(btn_clear, "PADDING", "30x2");
 
         //điều chỉnh các text box
@@ -1316,7 +1326,7 @@ int btn_descrypt_vigenere_cb(Ihandle * self) {
         //gán các event cho các nút
 
         IupSetCallback(btn_encrypt, "ACTION", (Icallback)btn_encrypt_vigenere_cb);
-        IupSetCallback(btn_descrypt, "ACTION", (Icallback)btn_descrypt_vigenere_cb);
+        IupSetCallback(btn_decrypt, "ACTION", (Icallback)btn_decrypt_vigenere_cb);
         IupSetCallback(btn_clear, "ACTION", (Icallback)btn_clear_cb);
 
         //gán event cho các nút trong menu
