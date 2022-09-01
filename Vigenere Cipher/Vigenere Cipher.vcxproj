@@ -24,6 +24,7 @@
     <ProjectGuid>{a9ebff2a-65f2-4784-93f2-d3d0300ae599}</ProjectGuid>
     <RootNamespace>VigenereCipher</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <ProjectName>Vigenere Cipher</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">

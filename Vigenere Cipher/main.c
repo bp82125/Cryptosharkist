@@ -1315,9 +1315,9 @@ int btn_decrypt_vigenere_cb(Ihandle * self) {
         );
 
         IupSetHandle("dlg", dlg);
-
         //điều chỉnh dialog
-        IupSetAttribute(dlg, "TITLE", "Vigenère Cipher");
+        IupSetAttribute(dlg, "ICON", "Shark");
+        IupSetAttribute(dlg, "TITLE", "Cryptosharkist");
         IupSetAttributeHandle(dlg, "MENU", main_menu);
         IupSetAttribute(dlg, "SIZE", "THIRDx250");
         IupSetAttribute(dlg, "RESIZE", "YES");
