@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.2.32602.215
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Vigenere Cipher", "Vigenere Cipher\Vigenere Cipher.vcxproj", "{A9EBFF2A-65F2-4784-93F2-D3D0300AE599}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Cryptosharkist", "Cryptosharkist\Cryptosharkist.vcxproj", "{A9EBFF2A-65F2-4784-93F2-D3D0300AE599}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{822235B7-617E-473D-B47D-EFEF44804035}"
 EndProject
