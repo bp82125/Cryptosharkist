@@ -29,9 +29,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <Manifest Include="Vigenere Cipher.exe.manifest" />
-  </ItemGroup>
-  <ItemGroup>
     <ClInclude Include="icon.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -46,12 +43,15 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="Vigenere Cipher.rc">
+    <Manifest Include="Cryptosharkist.exe.manifest" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Cryptosharkist.rc">
       <Filter>Resource Files</Filter>
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <Image Include="C:\Users\Admin\Downloads\shark-_1_.ico">
+    <Image Include="shark.ico">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>

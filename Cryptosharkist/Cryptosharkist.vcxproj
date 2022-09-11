@@ -24,7 +24,7 @@
     <ProjectGuid>{a9ebff2a-65f2-4784-93f2-d3d0300ae599}</ProjectGuid>
     <RootNamespace>VigenereCipher</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
-    <ProjectName>Vigenere Cipher</ProjectName>
+    <ProjectName>Cryptosharkist</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -186,19 +186,19 @@
     <ClCompile Include="utf8.c" />
   </ItemGroup>
   <ItemGroup>
-    <Manifest Include="Vigenere Cipher.exe.manifest" />
-  </ItemGroup>
-  <ItemGroup>
     <ClInclude Include="anyascii.h" />
     <ClInclude Include="icon.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="utf8.h" />
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="Vigenere Cipher.rc" />
+    <Manifest Include="Cryptosharkist.exe.manifest" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="C:\Users\Admin\Downloads\shark-_1_.ico" />
+    <ResourceCompile Include="Cryptosharkist.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="shark.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
