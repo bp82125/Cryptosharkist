@@ -1,41 +1,46 @@
-# Mã hoá chuỗi bằng Vigenère cipher
-## Yêu cầu 
+# Encrypting Strings with Vigenère Cipher
+
+## Requirements 
 [Microsoft Visual C++ 2015-2022 Redistribute x86](https://docs.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist?view=msvc-170)
-## Tính năng
-- Có thể mã hoá chuỗi với cả kí tự thường, hoa và các kí tự đặc biệt khác <br />
-- Mã hoá không giới hạn số lượng kí tự của chuỗi <br />
-- Giao diện đồ hoạ thân thiện với người dùng, sử dụng [IUP](https://www.tecgraf.puc-rio.br/iup/) <br />
-- Có thể khởi tạo keyword ngẫu nhiên và tạo keyword ngẫu nhiên với nhiều input liên tiếp <br />
-- Đọc và mã hoá file .txt, lưu output cũng dưới định dạng file .txt <br />
-## Mục tiêu tương lai
-- Thêm icon vào các nút chức năng, thêm logo vào phần mềm <br />
-- Thêm dark mode <br />
-- Thêm list cho phép mã hoá nhiều loại mã khác nhau
-## Cách mã hoá
-  Giả sử với một chuỗi cho trước sau:
+
+## Features
+- Can encrypt strings with lowercase, uppercase, and special characters <br />
+- Unlimited string length for encryption <br />
+- User-friendly graphical interface, using [IUP](https://www.tecgraf.puc-rio.br/iup/) <br />
+- Able to initialize random keywords and generate random keywords with multiple consecutive inputs <br />
+- Read and encrypt .txt files, saving output in .txt format as well <br />
+
+## Future Goals
+- Add icons to functional buttons, integrate a logo into the software <br />
+- Implement a dark mode <br />
+- Introduce a list to allow encryption of various cipher types <br />
+
+## Encryption Process
+Suppose we have a given string:
+
   ```
   The quick brown fox jumps over the lazy dog
   ```
-  Kèm theo đó là một keyword cho trước, ví dụ:
+  Along with a provided keyword, for example:
   ```
   huy
   ```
-  Đầu tiên chúng ta sẽ thay thế từng kí tự của chuỗi gốc bằng các kí tự của keyword:
+  First, we replace each character of the original string with characters from the keyword:
   ```
   huy huyhu yhuyh uyh huyhu yhuy huy huyh uyh
   ```
-  Sử dụng bảng sau để tra kí tự mã hoá: <br >
+  We use the following table to find the encryption character: <br >
   
-  ![Bang Vigenere](https://crypto.interactive-maths.com/uploads/1/1/3/4/11345755/1889186_orig.jpg)
+  ![Vigenere Table](https://crypto.interactive-maths.com/uploads/1/1/3/4/11345755/1889186_orig.jpg)
   
-  Kí tự ở chuỗi gốc tượng trưng cho vị trí cột, kí tự của chuỗi thay thế tượng trưng cho hàm ngang <br >
-  Ví dụ, với 3 kí tự đầu tiên của mỗi chuỗi, kết quả mã hoá tương ứng sẽ là:
+  The character in the original string corresponds to the column position, and the character from the replacement string corresponds to the row position <br >
+  For example, for the first 3 characters of each string, the corresponding encryption result would be:
   ```
   [T][h] = A
   [h][u] = b
   [e][y] = c
   ```
-  Tương tự với các kí tự còn lại, ta được chuỗi đã mã hoá sau:
+  Similarly, for the remaining characters, we get the encrypted string as follows:
   ```
   Abc xogje zyiuu zme dstjq vpcy nfl fygs bva
   ```
